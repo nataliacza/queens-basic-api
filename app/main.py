@@ -1,13 +1,15 @@
 from typing import List
-from uuid import UUID, uuid4
+from uuid import UUID
 
 import uvicorn
 from fastapi import FastAPI
 from starlette.responses import JSONResponse
 
 from app.db_memory import category_db, city_db, queen_db
-from app.helpers import is_unique, is_assigned, generate_new_uuid, delete_tag_from_queens, update_tag_name_in_queens
-from app.schemas import City, CitySave, Category, CategorySave, Queen, QueenSave
+from app.helpers import (is_unique, is_assigned, generate_new_uuid,
+                         delete_tag_from_queens_db, update_tag_name_in_queens_db,
+                         update_city_in_queens_db)
+from app.schemas import (City, CitySave, Category, CategorySave, Queen, QueenSave)
 
 
 app = FastAPI(title="Drag Queens Basic API")
@@ -104,6 +106,37 @@ async def delete_city(city_id: UUID):
     return JSONResponse(status_code=404, content={"code": "404",
                                                   "message": "Not Found"})
 
+
+@app.put("/v1/cities/{city_id}",
+         tags=["Cities"],
+         status_code=200,
+         responses={"400": {"code": "400", "message": "Bad Request"},
+                    "404": {"code": "404", "message": "Not Found"}},
+         response_model=City)
+async def update_city(city_id: UUID, update_data: CitySave):
+    find_city = city_db.get(str(city_id))
+    if find_city:
+        clean_name = update_data.name.title().strip()
+
+        check = is_unique(search=clean_name, in_key="name", db=city_db)
+        if not check:
+            return JSONResponse(status_code=400, content={"code": "400",
+                                                          "message": "Name must be unique"})
+        clean_region = update_data.region.title().strip()
+        clean_country = update_data.country.title().strip()
+
+        new_data_cleaned = {"name": clean_name,
+                            "region": clean_region,
+                            "country": clean_country}
+
+        find_city.update(new_data_cleaned)
+
+        update_city_in_queens_db(str(city_id), new_data_cleaned)
+        return find_city
+
+    return JSONResponse(status_code=404, content={"code": "404",
+                                                  "message": "Not Found"})
+
 # endregion
 
 # region Categories
@@ -159,7 +192,7 @@ async def delete_category(category_id: UUID):
     find_category = category_db.get(str(category_id))
     if find_category:
         del category_db[str(category_id)]
-        delete_tag_from_queens(str(category_id))
+        delete_tag_from_queens_db(str(category_id))
         return {}
 
     return JSONResponse(status_code=404, content={"code": "404",
@@ -183,7 +216,7 @@ async def update_category(category_id: UUID, update_data: CategorySave):
         clean_name = update_data.name.lower().strip()
         find_category["name"] = clean_name
 
-        update_tag_name_in_queens(str(category_id), clean_name)
+        update_tag_name_in_queens_db(str(category_id), clean_name)
         return find_category
 
     return JSONResponse(status_code=404, content={"code": "404",

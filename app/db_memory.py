@@ -6,8 +6,16 @@ queen_db = {
         "status": "Active",
         "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut...",
         "on_stage_since": 2000,
-        "hometown": None,
-        "residence": None,
+        "hometown": {
+            "city_id": "eb195501-603e-46f4-b3f1-71f7de304a28",
+            "name": "Warszawa",
+            "region": "Mazowieckie",
+            "country": "Polska"},
+        "residence": {
+            "city_id": "eb195501-603e-46f4-b3f1-71f7de304a28",
+            "name": "Warszawa",
+            "region": "Mazowieckie",
+            "country": "Polska"},
         "email": "twoja@stara.pl",
         "web": "https://www.twoja-stara.com",
         "instagram": "https://www.instagram.com/twoja___stara/",
