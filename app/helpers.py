@@ -29,15 +29,30 @@ def generate_new_uuid() -> str:
     return new_id
 
 
-def delete_tag_from_queens(category_id: str, db: dict = queen_db) -> None:
+def delete_tag_from_queens_db(category_id: str, db: dict = queen_db) -> None:
     for queen in db.values():
         for i, tag in enumerate(queen.get("tags")):
             if category_id in tag["category_id"]:
                 del queen["tags"][i]
 
-def update_tag_name_in_queens(category_id: str, update_name: str, db: dict = queen_db) -> None:
+
+def update_tag_name_in_queens_db(category_id: str, update_name: str, db: dict = queen_db) -> None:
     for queen in db.values():
         for i, tag in enumerate(queen.get("tags")):
             if category_id in tag["category_id"]:
                 queen["tags"][i]["name"] = update_name
                 print(queen["tags"][i]["name"])
+
+
+def update_city_in_queens_db(city_id: str, new_data_cleaned: dict, db: dict = queen_db) -> None:
+    for queen in db.values():
+        get_hometown = queen.get("hometown")
+        get_residence = queen.get("residence")
+
+        if get_hometown is not None:
+            if get_hometown["city_id"] == city_id:
+                get_hometown.update(new_data_cleaned)
+
+        if get_residence is not None:
+            if get_residence["city_id"] == city_id:
+                get_residence.update(new_data_cleaned)
