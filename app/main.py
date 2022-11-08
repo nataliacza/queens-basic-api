@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from starlette.responses import JSONResponse
 
 from app.db_memory import category_db, city_db, queen_db
-from app.helpers import is_unique, is_assigned, generate_new_uuid
+from app.helpers import is_unique, is_assigned, generate_new_uuid, delete_tag_from_queens
 from app.schemas import City, CitySave, Category, CategorySave, Queen, QueenSave
 
 
@@ -149,6 +149,21 @@ async def add_category(category_details: CategorySave):
     category_db[str(new_object.category_id)] = new_object.dict()
 
     return new_object
+
+
+@app.delete("/v1/categories/{category_id}",
+            tags=["Categories"],
+            status_code=204,
+            responses={"404": {"code": "404", "message": "Not Found"}})
+async def delete_category(category_id: UUID):
+    find_category = category_db.get(str(category_id))
+    if find_category:
+        del category_db[str(category_id)]
+        delete_tag_from_queens(str(category_id))
+        return {}
+
+    return JSONResponse(status_code=404, content={"code": "404",
+                                                  "message": "Not Found"})
 
 # endregion
 

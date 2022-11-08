@@ -27,3 +27,10 @@ def is_assigned(search_id: str,
 def generate_new_uuid() -> str:
     new_id = str(uuid.uuid4())
     return new_id
+
+
+def delete_tag_from_queens(category_id: str, db: dict = queen_db) -> None:
+    for queen in db.values():
+        for i, tag in enumerate(queen.get("tags")):
+            if category_id in tag["category_id"]:
+                del queen["tags"][i]
