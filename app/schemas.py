@@ -2,7 +2,7 @@ from enum import Enum
 from typing import List
 from uuid import UUID
 
-from pydantic import BaseModel, EmailStr, HttpUrl
+from pydantic import BaseModel, EmailStr, HttpUrl, Field
 
 
 class Status(str, Enum):
@@ -46,7 +46,7 @@ class Queen(BaseModel):
     instagram: HttpUrl | None
     facebook: HttpUrl | None
     twitter: HttpUrl | None
-    tags: List[Category] | None
+    tags: List[Category] = Field(default=[])
 
 
 class QueenSave(BaseModel):
@@ -61,4 +61,4 @@ class QueenSave(BaseModel):
     instagram: HttpUrl | None
     facebook: HttpUrl | None
     twitter: HttpUrl | None
-    tags: List[Category] | None
+    tags: List[Category] = Field(default=[])
