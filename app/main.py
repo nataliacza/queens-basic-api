@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from starlette.responses import JSONResponse
 
 from app.db_memory import category_db, city_db, queen_db
-from app.helpers import is_unique
+from app.helpers import is_unique, is_assigned
 from app.schemas import City, CitySave, Category, CategorySave, Queen, QueenSave
 
 
@@ -76,6 +76,25 @@ async def add_city(city_details: CitySave):
     new_object["city_id"] = new_id
     city_db[new_id] = new_object
     return new_object
+
+
+@app.delete("/v1/cities/{city_id}",
+            tags=["Cities"],
+            status_code=204,
+            responses={"404": {"code": "404", "message": "Not Found"},
+                       "409": {"code": "409", "message": "Conflict"}})
+async def delete_city(city_id: UUID):
+    find_city = city_db.get(str(city_id))
+    if find_city:
+        check = is_assigned(search_id=find_city["city_id"])
+        if check:
+            return JSONResponse(status_code=409, content={"code": "409",
+                                                          "message": "City is assigned to queen"})
+        del city_db[str(city_id)]
+        return {}
+
+    return JSONResponse(status_code=404, content={"code": "404",
+                                                  "message": "Not Found"})
 
 # endregion
 
