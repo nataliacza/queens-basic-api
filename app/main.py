@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from starlette.responses import JSONResponse
 
 from app.db_memory import category_db, city_db, queen_db
-from app.helpers import is_unique, is_assigned
+from app.helpers import is_unique, is_assigned, generate_new_uuid
 from app.schemas import City, CitySave, Category, CategorySave, Queen, QueenSave
 
 
@@ -119,6 +119,26 @@ async def get_category(category_id: UUID):
     if result:
         return result
     return JSONResponse(status_code=404, content={"code": "404", "message": "Not Found"})
+
+
+@app.post("/v1/categories/",
+          tags=["Categories"],
+          status_code=201,
+          responses={"400": {"code": "400", "message": "Bad Request"}},
+          response_model=Category)
+async def add_category(category_details: CategorySave):
+
+    check = is_unique(search=category_details.name.lower().strip(),
+                      in_key="name",
+                      db=category_db)
+    if not check:
+        return JSONResponse(status_code=400,
+                            content={"code": "400", "message": "Name must be unique"})
+
+    new_object = Category(category_id=generate_new_uuid(),
+                          name=category_details.name.lower().strip())
+
+    return new_object
 
 # endregion
 

@@ -1,3 +1,4 @@
+import uuid
 from typing import Tuple
 
 from app.db_memory import queen_db
@@ -21,3 +22,7 @@ def is_assigned(search_id: str,
         if search_id == check_hometown or search_id == check_residence:
             return True
     return False
+
+
+def generate_new_uuid() -> str:
+    return str(uuid.uuid4())
