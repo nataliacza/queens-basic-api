@@ -1,11 +1,12 @@
 from typing import List
-from uuid import UUID
+from uuid import UUID, uuid4
 
 import uvicorn
 from fastapi import FastAPI
 from starlette.responses import JSONResponse
 
 from app.db_memory import category_db, city_db, queen_db
+from app.helpers import is_unique
 from app.schemas import City, CitySave, Category, CategorySave, Queen, QueenSave
 
 
@@ -58,6 +59,23 @@ async def get_city(city_id: UUID):
     if result:
         return result
     return JSONResponse(status_code=404, content={"code": "404", "message": "Not Found"})
+
+
+@app.post("/v1/cities/",
+          tags=["Cities"],
+          status_code=201,
+          responses={"400": {"code": "400", "message": "Bad Request"}},
+          response_model=City)
+async def add_city(city_details: CitySave):
+    check = is_unique(search=city_details.name.title().strip(), in_key="name", db=city_db)
+    if not check:
+        return JSONResponse(status_code=400, content={"code": "400",
+                                                      "message": "Name must be unique."})
+    new_id = str(uuid4())
+    new_object = city_details.dict()
+    new_object["city_id"] = new_id
+    city_db[new_id] = new_object
+    return new_object
 
 # endregion
 
