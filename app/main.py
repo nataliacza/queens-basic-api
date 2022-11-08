@@ -67,14 +67,22 @@ async def get_city(city_id: UUID):
           responses={"400": {"code": "400", "message": "Bad Request"}},
           response_model=City)
 async def add_city(city_details: CitySave):
-    check = is_unique(search=city_details.name.title().strip(), in_key="name", db=city_db)
+
+    check = is_unique(search=city_details.name.title().strip(),
+                      in_key="name",
+                      db=city_db)
+
     if not check:
         return JSONResponse(status_code=400, content={"code": "400",
-                                                      "message": "Name must be unique."})
-    new_id = str(uuid4())
-    new_object = city_details.dict()
-    new_object["city_id"] = new_id
-    city_db[new_id] = new_object
+                                                      "message": "Name must be unique"})
+
+    new_object = City(city_id=generate_new_uuid(),
+                      name=city_details.name.title().strip(),
+                      region=city_details.region,
+                      country=city_details.country)
+
+    city_db[str(new_object.city_id)] = new_object.dict()
+
     return new_object
 
 
@@ -137,6 +145,8 @@ async def add_category(category_details: CategorySave):
 
     new_object = Category(category_id=generate_new_uuid(),
                           name=category_details.name.lower().strip())
+
+    category_db[str(new_object.category_id)] = new_object.dict()
 
     return new_object
 
