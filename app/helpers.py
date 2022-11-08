@@ -34,3 +34,10 @@ def delete_tag_from_queens(category_id: str, db: dict = queen_db) -> None:
         for i, tag in enumerate(queen.get("tags")):
             if category_id in tag["category_id"]:
                 del queen["tags"][i]
+
+def update_tag_name_in_queens(category_id: str, update_name: str, db: dict = queen_db) -> None:
+    for queen in db.values():
+        for i, tag in enumerate(queen.get("tags")):
+            if category_id in tag["category_id"]:
+                queen["tags"][i]["name"] = update_name
+                print(queen["tags"][i]["name"])

@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from starlette.responses import JSONResponse
 
 from app.db_memory import category_db, city_db, queen_db
-from app.helpers import is_unique, is_assigned, generate_new_uuid, delete_tag_from_queens
+from app.helpers import is_unique, is_assigned, generate_new_uuid, delete_tag_from_queens, update_tag_name_in_queens
 from app.schemas import City, CitySave, Category, CategorySave, Queen, QueenSave
 
 
@@ -161,6 +161,30 @@ async def delete_category(category_id: UUID):
         del category_db[str(category_id)]
         delete_tag_from_queens(str(category_id))
         return {}
+
+    return JSONResponse(status_code=404, content={"code": "404",
+                                                  "message": "Not Found"})
+
+
+@app.put("/v1/categories/{category_id}",
+         tags=["Categories"],
+         status_code=200,
+         responses={"400": {"code": "400", "message": "Bad Request"},
+                    "404": {"code": "404", "message": "Not Found"}},
+         response_model=Category)
+async def update_category(category_id: UUID, update_data: CategorySave):
+    find_category = category_db.get(str(category_id))
+    if find_category:
+        check = is_unique(search=update_data.name.lower().strip(), in_key="name", db=category_db)
+        if not check:
+            return JSONResponse(status_code=400, content={"code": "400",
+                                                          "message": "Name must be unique"})
+
+        clean_name = update_data.name.lower().strip()
+        find_category["name"] = clean_name
+
+        update_tag_name_in_queens(str(category_id), clean_name)
+        return find_category
 
     return JSONResponse(status_code=404, content={"code": "404",
                                                   "message": "Not Found"})
