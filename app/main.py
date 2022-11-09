@@ -52,8 +52,8 @@ async def add_queen(queen_details: QueenSave):
     error = {"status": False, "reason": ""}
 
     while error["status"] is False:
-        if queen_details.hometown_id is not None:
-            get_hometown = city_db.get(str(queen_details.hometown_id))
+        if queen_details.hometown is not None:
+            get_hometown = city_db.get(str(queen_details.hometown))
             if get_hometown is None:
                 error["status"] = True
                 error["reason"] = "Hometown City"
@@ -61,8 +61,8 @@ async def add_queen(queen_details: QueenSave):
             else:
                 hometown = get_hometown
 
-        if queen_details.residence_id is not None:
-            get_residence = city_db.get(str(queen_details.residence_id))
+        if queen_details.residence is not None:
+            get_residence = city_db.get(str(queen_details.residence))
             if get_residence is None:
                 error["status"] = True
                 error["reason"] = "Residence City"
@@ -70,8 +70,8 @@ async def add_queen(queen_details: QueenSave):
             else:
                 residence = get_residence
 
-        if len(queen_details.tag_ids) > 0:
-            for tag_id in queen_details.tag_ids:
+        if len(queen_details.tags) > 0:
+            for tag_id in queen_details.tags:
                 get_tag = category_db.get(str(tag_id))
                 if get_tag is None:
                     error["status"] = True
@@ -102,6 +102,74 @@ async def add_queen(queen_details: QueenSave):
     queen_db[str(new_object.queen_id)] = new_object.dict()
 
     return new_object
+
+
+@app.put("/v1/queens/{queen_id}",
+         tags=["Queens"],
+         status_code=200,
+         responses={"404": {"code": "404", "message": "Not Found"}},
+         response_model=Queen)
+async def update_queen(queen_id: UUID, queen_details: QueenSave):
+
+    find_queen = queen_db.get(str(queen_id))
+    hometown = None
+    residence = None
+    tags = []
+    error = {"status": False, "reason": ""}
+
+    while error["status"] is False:
+        if not find_queen:
+            error["status"] = True
+            error["reason"] = "Queen"
+            break
+
+        if queen_details.hometown is not None:
+            get_hometown = city_db.get(str(queen_details.hometown))
+            if get_hometown is None:
+                error["status"] = True
+                error["reason"] = "Hometown City"
+                break
+            else:
+                hometown = get_hometown
+
+        if queen_details.residence is not None:
+            get_residence = city_db.get(str(queen_details.residence))
+            if get_residence is None:
+                error["status"] = True
+                error["reason"] = "Residence City"
+                break
+            else:
+                residence = get_residence
+
+        if len(queen_details.tags) > 0:
+            for tag_id in queen_details.tags:
+                get_tag = category_db.get(str(tag_id))
+                if get_tag is None:
+                    error["status"] = True
+                    error["reason"] = "Tag"
+                    break
+                else:
+                    tags.append(get_tag)
+        break
+
+    if error["status"] is True:
+        return JSONResponse(status_code=404, content={"code": "404",
+                                                      "message": f"{error['reason']} Id Not Found"})
+
+    find_queen.update(queen_details.dict())
+
+    if hometown is not None:
+        find_queen["hometown"] = hometown
+
+    if residence is not None:
+        find_queen["residence"] = residence
+
+    if len(tags) > 0:
+        find_queen["tags"] = tags
+
+    queen_db[str(queen_id)] = find_queen
+
+    return find_queen
 
 
 @app.delete("/v1/queens/{queen_id}",

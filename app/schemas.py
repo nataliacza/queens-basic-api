@@ -54,11 +54,11 @@ class QueenSave(BaseModel):
     status: StatusEnum = Field(default=StatusEnum.Unknown)
     info: str | None
     on_stage_since: int | None
-    hometown_id: UUID | None
-    residence_id: UUID | None
+    hometown: UUID | None
+    residence: UUID | None
     email: EmailStr | None
     web: HttpUrl | None
     instagram: HttpUrl | None
     facebook: HttpUrl | None
     twitter: HttpUrl | None
-    tag_ids: List[UUID] = Field(default=[])
+    tags: List[UUID] = Field(default=[])
