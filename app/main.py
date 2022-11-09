@@ -39,6 +39,59 @@ async def get_queen(queen_id: UUID):
                                                   "message": "Not Found"})
 
 
+@app.post("/v1/queens/",
+          tags=["Queens"],
+          status_code=201,
+          responses={"404": {"code": "404", "message": "Not Found"}},
+          response_model=Queen)
+async def add_queen(queen_details: QueenSave):
+
+    hometown = None
+    residence = None
+    tags = []
+
+    # TODO: refactor those to separate functions - used probably also in update
+    if queen_details.hometown_id is not None:
+        get_hometown = city_db.get(str(queen_details.hometown_id))
+        if get_hometown is None:
+            return JSONResponse(status_code=404, content={"code": "404",
+                                                          "message": "Hometown City Id Not Found"})
+        hometown = get_hometown
+
+    if queen_details.residence_id is not None:
+        get_residence = city_db.get(str(queen_details.residence_id))
+        if get_residence is None:
+            return JSONResponse(status_code=404, content={"code": "404",
+                                                          "message": "Residence City Id Not Found"})
+        residence = get_residence
+
+    if queen_details.tag_ids is not None:
+        for tag_id in queen_details.tag_ids:
+            get_tag = category_db.get(str(tag_id))
+            if get_tag is None:
+                return JSONResponse(status_code=404, content={"code": "404",
+                                                              "message": "Tag Id Not Found"})
+            tags.append(get_tag)
+
+    new_object = Queen(queen_id=generate_new_uuid(),
+                       nickname=queen_details.nickname,
+                       status=queen_details.status,
+                       info=queen_details.info,
+                       on_stage_since=queen_details.on_stage_since,
+                       hometown=hometown,
+                       residence=residence,
+                       email=queen_details.email,
+                       web=queen_details.web,
+                       instagram=queen_details.instagram,
+                       facebook=queen_details.facebook,
+                       twitter=queen_details.twitter,
+                       tags=tags)
+
+    queen_db[str(new_object.queen_id)] = new_object.dict()
+
+    return new_object
+
+
 @app.delete("/v1/queens/{queen_id}",
             tags=["Queens"],
             status_code=204,

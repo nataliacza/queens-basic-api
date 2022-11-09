@@ -5,7 +5,7 @@ from uuid import UUID
 from pydantic import BaseModel, EmailStr, HttpUrl, Field
 
 
-class Status(str, Enum):
+class StatusEnum(str, Enum):
     Active = "Active"
     Inactive = "Inactive"
     Unknown = "Unknown"
@@ -36,7 +36,7 @@ class CategorySave(BaseModel):
 class Queen(BaseModel):
     queen_id: UUID
     nickname: str
-    status: Status
+    status: StatusEnum = Field(default=StatusEnum.Unknown)
     info: str | None
     on_stage_since: int | None
     hometown: City | None
@@ -51,7 +51,7 @@ class Queen(BaseModel):
 
 class QueenSave(BaseModel):
     nickname: str
-    status: Status
+    status: StatusEnum = Field(default=StatusEnum.Unknown)
     info: str | None
     on_stage_since: int | None
     hometown_id: UUID | None
@@ -61,4 +61,4 @@ class QueenSave(BaseModel):
     instagram: HttpUrl | None
     facebook: HttpUrl | None
     twitter: HttpUrl | None
-    tags: List[Category] = Field(default=[])
+    tag_ids: List[UUID] = Field(default=[])
