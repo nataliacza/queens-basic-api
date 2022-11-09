@@ -38,6 +38,20 @@ async def get_queen(queen_id: UUID):
     return JSONResponse(status_code=404, content={"code": "404",
                                                   "message": "Not Found"})
 
+
+@app.delete("/v1/queens/{queen_id}",
+            tags=["Queens"],
+            status_code=204,
+            responses={"404": {"code": "404", "message": "Not Found"}})
+async def delete_queen(queen_id: UUID):
+    find_queen = queen_db.get(str(queen_id))
+    if find_queen:
+        del queen_db[str(queen_id)]
+        return {}
+
+    return JSONResponse(status_code=404, content={"code": "404",
+                                                  "message": "Not Found"})
+
 # endregion
 
 # region Cities
