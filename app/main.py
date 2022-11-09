@@ -49,29 +49,41 @@ async def add_queen(queen_details: QueenSave):
     hometown = None
     residence = None
     tags = []
+    error = {"status": False, "reason": ""}
 
-    # TODO: refactor those to separate functions - used probably also in update
-    if queen_details.hometown_id is not None:
-        get_hometown = city_db.get(str(queen_details.hometown_id))
-        if get_hometown is None:
-            return JSONResponse(status_code=404, content={"code": "404",
-                                                          "message": "Hometown City Id Not Found"})
-        hometown = get_hometown
+    while error["status"] is False:
+        if queen_details.hometown_id is not None:
+            get_hometown = city_db.get(str(queen_details.hometown_id))
+            if get_hometown is None:
+                error["status"] = True
+                error["reason"] = "Hometown City"
+                break
+            else:
+                hometown = get_hometown
 
-    if queen_details.residence_id is not None:
-        get_residence = city_db.get(str(queen_details.residence_id))
-        if get_residence is None:
-            return JSONResponse(status_code=404, content={"code": "404",
-                                                          "message": "Residence City Id Not Found"})
-        residence = get_residence
+        if queen_details.residence_id is not None:
+            get_residence = city_db.get(str(queen_details.residence_id))
+            if get_residence is None:
+                error["status"] = True
+                error["reason"] = "Residence City"
+                break
+            else:
+                residence = get_residence
 
-    if queen_details.tag_ids is not None:
-        for tag_id in queen_details.tag_ids:
-            get_tag = category_db.get(str(tag_id))
-            if get_tag is None:
-                return JSONResponse(status_code=404, content={"code": "404",
-                                                              "message": "Tag Id Not Found"})
-            tags.append(get_tag)
+        if len(queen_details.tag_ids) > 0:
+            for tag_id in queen_details.tag_ids:
+                get_tag = category_db.get(str(tag_id))
+                if get_tag is None:
+                    error["status"] = True
+                    error["reason"] = "Tag"
+                    break
+                else:
+                    tags.append(get_tag)
+        break
+
+    if error["status"] is True:
+        return JSONResponse(status_code=404, content={"code": "404",
+                                                      "message": f"{error['reason']} Id Not Found"})
 
     new_object = Queen(queen_id=generate_new_uuid(),
                        nickname=queen_details.nickname,
