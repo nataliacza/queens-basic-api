@@ -1,32 +1,29 @@
 from typing import List
 from uuid import UUID
 
-import uvicorn
 from fastapi import FastAPI
 from starlette.responses import JSONResponse
 
-from app.db_memory import category_db, city_db, queen_db
-from app.helpers import (is_unique, is_assigned, generate_new_uuid,
-                         delete_tag_from_queens_db, update_tag_name_in_queens_db,
-                         update_city_in_queens_db)
-from app.schemas import (City, CitySave, Category, CategorySave, Queen, QueenSave)
-
+from app.db_memory import queen_db, city_db, category_db
+from app.helpers import (generate_new_uuid, is_unique, is_assigned, update_city_in_queens_db,
+                     delete_tag_from_queens_db, update_tag_name_in_queens_db)
+from app.schemas import Queen, QueenSave, City, CitySave, Category, CategorySave, QueenBase
 
 app = FastAPI(title="Drag Queens Basic API")
 
 
 # region Queens
 
-@app.get("/v1/queens/",
+@app.get("/api/v1/queens/",
          tags=["Queens"],
          status_code=200,
-         response_model=List[Queen])
+         response_model=List[QueenBase])
 async def get_all_queens():
     result = [queen for queen in queen_db.values()]
     return result
 
 
-@app.get("/v1/queens/{queen_id}",
+@app.get("/api/v1/queens/{queen_id}",
          tags=["Queens"],
          status_code=200,
          responses={"404": {"code": "404", "message": "Not Found"}},
@@ -39,7 +36,7 @@ async def get_queen(queen_id: UUID):
                                                   "message": "Not Found"})
 
 
-@app.post("/v1/queens/",
+@app.post("/api/v1/queens/",
           tags=["Queens"],
           status_code=201,
           responses={"404": {"code": "404", "message": "Not Found"}},
@@ -104,7 +101,7 @@ async def add_queen(queen_details: QueenSave):
     return new_object
 
 
-@app.put("/v1/queens/{queen_id}",
+@app.put("/api/v1/queens/{queen_id}",
          tags=["Queens"],
          status_code=200,
          responses={"404": {"code": "404", "message": "Not Found"}},
@@ -172,7 +169,7 @@ async def update_queen(queen_id: UUID, queen_details: QueenSave):
     return find_queen
 
 
-@app.delete("/v1/queens/{queen_id}",
+@app.delete("/api/v1/queens/{queen_id}",
             tags=["Queens"],
             status_code=204,
             responses={"404": {"code": "404", "message": "Not Found"}})
@@ -189,7 +186,7 @@ async def delete_queen(queen_id: UUID):
 
 # region Cities
 
-@app.get("/v1/cities/",
+@app.get("/api/v1/cities/",
          tags=["Cities"],
          status_code=200,
          response_model=List[City])
@@ -198,7 +195,7 @@ async def get_all_cities():
     return result
 
 
-@app.get("/v1/cities/{city_id}",
+@app.get("/api/v1/cities/{city_id}",
          tags=["Cities"],
          status_code=200,
          responses={"404": {"code": "404", "message": "Not Found"}},
@@ -210,7 +207,7 @@ async def get_city(city_id: UUID):
     return JSONResponse(status_code=404, content={"code": "404", "message": "Not Found"})
 
 
-@app.post("/v1/cities/",
+@app.post("/api/api/v1/cities/",
           tags=["Cities"],
           status_code=201,
           responses={"400": {"code": "400", "message": "Bad Request"}},
@@ -227,15 +224,15 @@ async def add_city(city_details: CitySave):
 
     new_object = City(city_id=generate_new_uuid(),
                       name=city_details.name.title().strip(),
-                      region=city_details.region,
-                      country=city_details.country)
+                      region=city_details.region.title().strip(),
+                      country=city_details.country.title().strip())
 
     city_db[str(new_object.city_id)] = new_object.dict()
 
     return new_object
 
 
-@app.delete("/v1/cities/{city_id}",
+@app.delete("/api/v1/cities/{city_id}",
             tags=["Cities"],
             status_code=204,
             responses={"404": {"code": "404", "message": "Not Found"},
@@ -254,7 +251,7 @@ async def delete_city(city_id: UUID):
                                                   "message": "Not Found"})
 
 
-@app.put("/v1/cities/{city_id}",
+@app.put("/api/v1/cities/{city_id}",
          tags=["Cities"],
          status_code=200,
          responses={"400": {"code": "400", "message": "Bad Request"},
@@ -288,7 +285,7 @@ async def update_city(city_id: UUID, update_data: CitySave):
 
 # region Categories
 
-@app.get("/v1/categories/",
+@app.get("/api/v1/categories/",
          tags=["Categories"],
          status_code=200,
          response_model=List[Category])
@@ -297,7 +294,7 @@ async def get_all_categories():
     return result
 
 
-@app.get("/v1/categories/{category_id}",
+@app.get("/api/v1/categories/{category_id}",
          tags=["Categories"],
          status_code=200,
          responses={"404": {"code": "404", "message": "Not Found"}},
@@ -309,7 +306,7 @@ async def get_category(category_id: UUID):
     return JSONResponse(status_code=404, content={"code": "404", "message": "Not Found"})
 
 
-@app.post("/v1/categories/",
+@app.post("/api/v1/categories/",
           tags=["Categories"],
           status_code=201,
           responses={"400": {"code": "400", "message": "Bad Request"}},
@@ -331,7 +328,7 @@ async def add_category(category_details: CategorySave):
     return new_object
 
 
-@app.delete("/v1/categories/{category_id}",
+@app.delete("/api/v1/categories/{category_id}",
             tags=["Categories"],
             status_code=204,
             responses={"404": {"code": "404", "message": "Not Found"}})
@@ -346,7 +343,7 @@ async def delete_category(category_id: UUID):
                                                   "message": "Not Found"})
 
 
-@app.put("/v1/categories/{category_id}",
+@app.put("/api/v1/categories/{category_id}",
          tags=["Categories"],
          status_code=200,
          responses={"400": {"code": "400", "message": "Bad Request"},
@@ -370,8 +367,3 @@ async def update_category(category_id: UUID, update_data: CategorySave):
                                                   "message": "Not Found"})
 
 # endregion
-
-
-# Code for debugging
-if __name__ == "__main__":
-    uvicorn.run(app, host="localhost", port=8001)
