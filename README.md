@@ -37,10 +37,16 @@ git clone https://github.com/nataliacza/queens-basic-api
 
 3. Install dependencies:
 ```
-pip install app/requirements.txt
+(while being in main project folder)
+pip install -r app/requirements.txt
 ```
 
 4. Run application on your local machine:
 ```
 uvicorn app.main:app --port 8000
+```
+
+5. Go to application api docs:
+```
+http://127.0.0.1:8000/docs
 ```
