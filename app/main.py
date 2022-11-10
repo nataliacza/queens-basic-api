@@ -1,12 +1,13 @@
 from typing import List
 from uuid import UUID
 
+import uvicorn
 from fastapi import FastAPI
 from starlette.responses import JSONResponse
 
 from app.db_memory import queen_db, city_db, category_db
 from app.helpers import (generate_new_uuid4, is_unique, is_assigned, update_city_in_queens_db,
-                         delete_tag_from_queens_db, update_tag_name_in_queens_db)
+                         delete_tag_from_queens_db, update_tag_name_in_queens_db, is_able_to_add_to_db)
 from app.schemas import Queen, QueenSave, City, CitySave, Category, CategorySave, QueenBase
 
 app = FastAPI(title="Drag Queens Basic API")
@@ -81,6 +82,10 @@ async def add_queen(queen_details: QueenSave):
     if error["status"] is True:
         return JSONResponse(status_code=404, content={"code": "404",
                                                       "message": f"{error['reason']} Id Not Found"})
+
+    if not is_able_to_add_to_db(queen_db):
+        return JSONResponse(status_code=400,
+                            content={"code": "400", "message": "Number of items in db was exceeded"})
 
     new_object = Queen(queen_id=generate_new_uuid4(),
                        nickname=queen_details.nickname,
@@ -222,6 +227,10 @@ async def add_city(city_details: CitySave):
         return JSONResponse(status_code=400, content={"code": "400",
                                                       "message": "Name must be unique"})
 
+    if not is_able_to_add_to_db(city_db):
+        return JSONResponse(status_code=400,
+                            content={"code": "400", "message": "Number of items in db was exceeded"})
+
     new_object = City(city_id=generate_new_uuid4(),
                       name=city_details.name.title().strip(),
                       region=city_details.region.title().strip(),
@@ -319,6 +328,10 @@ async def add_category(category_details: CategorySave):
     if not check:
         return JSONResponse(status_code=400,
                             content={"code": "400", "message": "Name must be unique"})
+
+    if not is_able_to_add_to_db(category_db):
+        return JSONResponse(status_code=400,
+                            content={"code": "400", "message": "Number of items in db was exceeded"})
 
     new_object = Category(category_id=generate_new_uuid4(),
                           name=category_details.name.lower().strip())
