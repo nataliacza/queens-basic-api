@@ -133,4 +133,4 @@ dmypy.json
 
 # Deploy & debug
 .deta
-/main-test.py
+/main-debug.py
