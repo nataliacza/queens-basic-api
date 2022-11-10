@@ -56,3 +56,10 @@ def update_city_in_queens_db(city_id: str, new_data_cleaned: dict, db: dict = qu
         if get_residence is not None:
             if get_residence["city_id"] == city_id:
                 get_residence.update(new_data_cleaned)
+
+
+def is_able_to_add_to_db(db: dict, limit: int = 20) -> bool:
+    """ Checks the limit of in-memory data. Default limit is 20. """
+    if len(db) >= limit:
+        return False
+    return True
