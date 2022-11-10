@@ -5,8 +5,8 @@ from fastapi import FastAPI
 from starlette.responses import JSONResponse
 
 from app.db_memory import queen_db, city_db, category_db
-from app.helpers import (generate_new_uuid, is_unique, is_assigned, update_city_in_queens_db,
-                     delete_tag_from_queens_db, update_tag_name_in_queens_db)
+from app.helpers import (generate_new_uuid4, is_unique, is_assigned, update_city_in_queens_db,
+                         delete_tag_from_queens_db, update_tag_name_in_queens_db)
 from app.schemas import Queen, QueenSave, City, CitySave, Category, CategorySave, QueenBase
 
 app = FastAPI(title="Drag Queens Basic API")
@@ -82,7 +82,7 @@ async def add_queen(queen_details: QueenSave):
         return JSONResponse(status_code=404, content={"code": "404",
                                                       "message": f"{error['reason']} Id Not Found"})
 
-    new_object = Queen(queen_id=generate_new_uuid(),
+    new_object = Queen(queen_id=generate_new_uuid4(),
                        nickname=queen_details.nickname,
                        status=queen_details.status,
                        info=queen_details.info,
@@ -222,7 +222,7 @@ async def add_city(city_details: CitySave):
         return JSONResponse(status_code=400, content={"code": "400",
                                                       "message": "Name must be unique"})
 
-    new_object = City(city_id=generate_new_uuid(),
+    new_object = City(city_id=generate_new_uuid4(),
                       name=city_details.name.title().strip(),
                       region=city_details.region.title().strip(),
                       country=city_details.country.title().strip())
@@ -320,7 +320,7 @@ async def add_category(category_details: CategorySave):
         return JSONResponse(status_code=400,
                             content={"code": "400", "message": "Name must be unique"})
 
-    new_object = Category(category_id=generate_new_uuid(),
+    new_object = Category(category_id=generate_new_uuid4(),
                           name=category_details.name.lower().strip())
 
     category_db[str(new_object.category_id)] = new_object.dict()

@@ -1,0 +1,742 @@
+openapi: 3.0.3
+info:
+  title: Drag Queens Collection PL
+  description: |
+    This is a Drag Queens api documentation based on the OpenApi specification. 
+    Main goal of the project is to create database available for everybody.
+  version: 1.0.0
+
+tags:
+  - name: Queens
+    description: Everything about your Drag Queens
+  - name: Categories
+    description: Everything about categories
+  - name: Cities
+    description: Everything about cities
+
+paths:
+# DRAG QUEENS BLOCK
+  /api/v1/queens/:
+    get:
+      tags: 
+        - Queens
+      summary: Gets a list of all Drag Queens
+      security: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueenArray'
+    post:
+      tags: 
+        - Queens
+      summary: Add new queen
+      security:
+        - bearerAuthJWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueenSave'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Queen'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /api/v1/queens/{queen_id}:
+    get:
+      tags: 
+        - Queens
+      summary: Get queen details
+      security: []
+      parameters:
+        - in: path
+          name: queen_id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Queen'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: 
+        - Queens
+      summary: Update queen details
+      security:
+        - bearerAuthJWT: []
+      parameters:
+        - in: path
+          name: queen_id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueenSave'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Queen'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags: 
+        - Queens
+      summary: Delete queen
+      security:
+        - bearerAuthJWT: []
+      parameters:
+        - in: path
+          name: queen_id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        '204':
+          description: The resource was deleted successfully.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+# CATEGORIES BLOCK
+  /api/v1/categories/:
+    get:
+      tags: 
+        - Categories
+      summary: Gets a list of all categories
+      security:
+        - bearerAuthJWT: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryArray'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: 
+        - Categories
+      summary: Add new category
+      security:
+        - bearerAuthJWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /api/v1/categories/{category_id}:
+    get:
+      tags: 
+        - Categories
+      summary: Get a category details
+      security:
+        - bearerAuthJWT: []
+      parameters:
+        - in: path
+          name: category_id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: 
+        - Categories
+      summary: Update category
+      security:
+        - bearerAuthJWT: []
+      parameters:
+        - in: path
+          name: category_id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags: 
+        - Categories
+      summary: Delete category
+      security:
+        - bearerAuthJWT: []
+      parameters:
+        - in: path
+          name: category_id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        '204':
+          description: The resource was deleted successfully.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+# CITIES BLOCK
+  /api/v1/cities/:
+    get:
+      tags: 
+        - Cities
+      summary: Gets a list of all cities
+      security:
+        - bearerAuthJWT: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CityArray'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: 
+        - Cities
+      summary: Add new city
+      security:
+        - bearerAuthJWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/City'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/City'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /api/v1/cities/{city_id}:
+    get:
+      tags: 
+        - Cities
+      summary: Get a city details
+      security:
+        - bearerAuthJWT: []
+      parameters:
+        - in: path
+          name: city_id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/City'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: 
+        - Cities
+      summary: Update city details
+      security:
+        - bearerAuthJWT: []
+      parameters:
+        - in: path
+          name: city_id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/City'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/City'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags: 
+        - Cities
+      summary: Delete city
+      description: Unable to delete resource, if any Queen is assigned to city.
+      security:
+        - bearerAuthJWT: []
+      parameters:
+        - in: path
+          name: city_id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        '204':
+          description: The resource was deleted successfully.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+components:
+  schemas:
+    # Core schemas
+    Queen:
+      type: object
+      required:
+      - queen_id
+      - nickname
+      - status
+      properties:
+        queen_id:
+          type: string
+          format: uuid
+          nullable: false
+          readOnly: true
+          example: 'fb8f3549-2211-4186-9a9e-63509cf7906f'
+        nickname:
+          type: string
+          nullable: false
+          minLength: 2
+          maxLength: 40
+          description: Artist stage name
+          example: 'Twoja Stara'
+        status:
+          type: string
+          nullable: false
+          default: 'Unknown'
+          description: Activity status
+          enum:
+            - 'Active'
+            - 'Inactive'
+            - 'Unknown'
+        info:
+          type: string
+          nullable: true
+          maxLength: 500
+          description: 'This queen is awesome performer!'
+        on_stage_since:
+          type: integer
+          nullable: true
+          format: int32
+          description: Performance start year
+          example: 2000
+        hometown:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/City'
+        residence:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/City'
+        email:
+          type: string
+          format: email
+          nullable: true
+          minLength: 5
+          maxLength: 30
+          description: Official email
+          example: 'twoja@stara.pl'
+        web:
+          type: string
+          nullable: true
+          minLength: 5
+          maxLength: 50
+          description: Official web page
+          example: 'https://www.twoja-stara.com'
+        instagram:
+          type: string
+          nullable: true
+          minLength: 5
+          maxLength: 50
+          description: Official Instagram page
+          example: 'https://www.instagram.com/twoja___stara/'
+        facebook:
+          type: string
+          nullable: true
+          minLength: 5
+          maxLength: 50
+          description: Official Facebook page
+          example: 'https://www.facebook.com/TwojaStaraDQ/'
+        twitter:
+          type: string
+          nullable: true
+          minLength: 5
+          maxLength: 50
+          description: Official Twitter page
+          example: 'https://www.twitter.com/twoja-stara/'
+        tags:
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/Category'
+    QueenSave:
+      type: object
+      required:
+      - nickname
+      properties:
+        nickname:
+          type: string
+          nullable: false
+          minLength: 2
+          maxLength: 40
+          description: Artist stage name
+          example: 'Twoja Stara'
+        status:
+          type: string
+          nullable: false
+          default: 'Unknown'
+          description: Activity status
+          enum:
+            - 'Active'
+            - 'Inactive'
+            - 'Unknown'
+        info:
+          type: string
+          nullable: true
+          maxLength: 500
+          description: 'This queen is awesome performer!'
+        on_stage_since:
+          type: integer
+          nullable: true
+          format: int32
+          description: Performance start year
+          example: 2000
+        hometown:
+          type: string
+          format: uuid
+          nullable: true
+          example: 'fb8f3549-2211-4186-9a9e-63509cf7906f'
+        residence:
+          type: string
+          format: uuid
+          nullable: true
+          example: 'fb8f3549-2211-4186-9a9e-63509cf7906f'
+        email:
+          type: string
+          format: email
+          nullable: true
+          minLength: 5
+          maxLength: 30
+          description: Official email
+          example: 'twoja@stara.pl'
+        web:
+          type: string
+          nullable: true
+          minLength: 5
+          maxLength: 50
+          description: Official web page
+          example: 'https://www.twoja-stara.com'
+        instagram:
+          type: string
+          nullable: true
+          minLength: 5
+          maxLength: 50
+          description: Official Instagram page
+          example: 'https://www.instagram.com/twoja___stara/'
+        facebook:
+          type: string
+          nullable: true
+          minLength: 5
+          maxLength: 50
+          description: Official Facebook page
+          example: 'https://www.facebook.com/TwojaStaraDQ/'
+        twitter:
+          type: string
+          nullable: true
+          minLength: 5
+          maxLength: 50
+          description: Official Twitter page
+          example: 'https://www.twitter.com/twoja-stara/'
+        tags:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+            format: uuid
+            nullable: true
+            example: 'fb8f3549-2211-4186-9a9e-63509cf7906f'
+    QueenBase:
+      type: object
+      required:
+      - queen_id
+      - nickname
+      - status
+      properties:
+        queen_id:
+          type: string
+          format: uuid
+          nullable: false
+          readOnly: true
+          example: 'fb8f3549-2211-4186-9a9e-63509cf7906f'
+        nickname:
+          type: string
+          nullable: false
+          minLength: 2
+          maxLength: 40
+          description: Artist stage name
+          example: 'Twoja Stara'
+        status:
+          type: string
+          nullable: false
+          default: 'Unknown'
+          description: Activity status
+          enum:
+            - 'Active'
+            - 'Inactive'
+            - 'Unknown'
+        on_stage_since:
+          type: integer
+          nullable: true
+          format: int32
+          description: Performance start year
+          example: 2000
+        tags:
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/Category'
+    QueenArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/QueenBase'
+
+    Category:
+      type: object
+      required:
+      - category_id
+      - name
+      properties:
+        category_id:
+          type: string
+          format: uuid
+          nullable: false
+          readOnly: true
+          example: 'fb8f3549-2211-4186-9a9e-63509cf7906f'
+        name:
+          type: string
+          nullable: false
+          minLength: 3
+          maxLength: 10
+          description: Performance category name
+          example: 'Glam'
+    CategoryArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/Category'
+    
+    City:
+      type: object
+      required:
+      - city_id
+      - name
+      - region
+      - country
+      properties:
+        city_id:
+          type: string
+          format: uuid
+          nullable: false
+          readOnly: true
+          example: 'fb8f3549-2211-4186-9a9e-63509cf7906f'
+        name:
+          type: string
+          nullable: false
+          maxLength: 50
+          description: City name
+          example: 'Warszawa'
+        region:
+          type: string
+          nullable: false
+          maxLength: 50
+          description: City region
+          example: 'Mazowieckie'
+        country:
+          type: string
+          nullable: false
+          maxLength: 50
+          description: Country name
+          example: 'Poland'
+    CityArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/City'
+
+    Error:
+        type: object
+        properties:
+          code:
+            type: string
+          message:
+            type: string
+        required:
+          - code
+          - message
+
+# REQUESTBODIES
+  requestBodies:
+    QueenBody:
+      description: A JSON object containing queen information
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Queen'
+    CategoryBody:
+      description: A JSON object containing category information
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Category'
+    CityBody:
+      description: A JSON object containing city information
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/City'
+
+# RESPONSES BLOCK
+  responses:
+      BadRequest:
+        description: Bad request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+      NotFound:
+        description: Resource Not Found
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+      ValidationError:
+        description: Validation Error
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+      Conflict:
+        description: Conflict
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+      Unauthorized:
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+    
+# SECURITY SCHEMES
+  securitySchemes:
+    bearerAuthJWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - bearerAuthJWT: []

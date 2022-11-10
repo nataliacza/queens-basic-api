@@ -24,7 +24,7 @@ def is_assigned(search_id: str,
     return False
 
 
-def generate_new_uuid() -> str:
+def generate_new_uuid4() -> str:
     new_id = str(uuid.uuid4())
     return new_id
 
