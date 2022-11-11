@@ -934,6 +934,7 @@
           "name": {
             "type": "string",
             "nullable": false,
+            "minLength": 3,
             "maxLength": 50,
             "description": "City name",
             "example": "Warszawa"
@@ -941,6 +942,7 @@
           "region": {
             "type": "string",
             "nullable": false,
+            "minLength": 3,
             "maxLength": 50,
             "description": "City region",
             "example": "Mazowieckie"
@@ -948,6 +950,7 @@
           "country": {
             "type": "string",
             "nullable": false,
+            "minLength": 3,
             "maxLength": 50,
             "description": "Country name",
             "example": "Poland"
