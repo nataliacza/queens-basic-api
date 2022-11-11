@@ -28,24 +28,24 @@ Original API documentation is located in <i>/docs</i> folder.
 
 API documentation:
 
-https://lgg0qu.deta.dev/docs
+https://e4hke1.deta.dev/docs
 
 Endpoints:
 ```
 [GET/POST]
-https://lgg0qu.deta.dev/api/v1/queens
+https://e4hke1.deta.dev/api/v1/queens
 [GET/PUT/DELETE]
-https://lgg0qu.deta.dev/api/v1/queens/{queen_id}
+https://e4hke1.deta.dev/api/v1/queens/{queen_id}
 
 [GET/POST]
-https://lgg0qu.deta.dev/api/v1/categories
+https://e4hke1.deta.dev/api/v1/categories
 [GET/PUT/DELETE]
-https://lgg0qu.deta.dev/api/v1/categories/{category_id}
+https://e4hke1.deta.dev/api/v1/categories/{category_id}
 
 [GET/POST]
-https://lgg0qu.deta.dev/api/v1/cities
+https://e4hke1.deta.dev/api/v1/cities
 [GET/PUT/DELETE]
-https://lgg0qu.deta.dev/api/v1/cities/{city_id}
+https://e4hke1.deta.dev/api/v1/cities/{city_id}
 ```
 
 ## Run the application locally
