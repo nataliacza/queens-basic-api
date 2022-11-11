@@ -1,20 +1,24 @@
 import uuid
+from uuid import UUID
 from typing import Tuple
 
 from app.db_memory import queen_db
 
 
-def is_unique(search: str,
-              db: dict,
-              in_key: str = "name") -> bool:
+def is_unique(search: str, db: dict, in_key: str = "name",
+              given_id: UUID = None, pk_name: str = None) -> bool:
+    """ Function that checks if field is unique across db. For PUT method additional
+    check for matching id and name is added. """
     for value in db.values():
+        if given_id:
+            if value.get(pk_name) == given_id and value.get(in_key) == search:
+                return True
         if search == value.get(in_key):
             return False
     return True
 
 
-def is_assigned(search_id: str,
-                db: dict = queen_db,
+def is_assigned(search_id: str, db: dict = queen_db,
                 in_keys: Tuple[str] = ("hometown", "residence", "city_id")) -> bool:
     for value in db.values():
         check_hometown = value.get(in_keys[0]).get(in_keys[2])
@@ -24,27 +28,21 @@ def is_assigned(search_id: str,
     return False
 
 
-def generate_new_uuid4() -> str:
-    new_id = str(uuid.uuid4())
-    return new_id
-
-
-def delete_tag_from_queens_db(category_id: str, db: dict = queen_db) -> None:
+def delete_tag_from_queens_db(category_id: UUID | str, db: dict = queen_db) -> None:
     for queen in db.values():
         for i, tag in enumerate(queen.get("tags")):
-            if category_id in tag["category_id"]:
+            if tag.get("category_id") == category_id:
                 del queen["tags"][i]
 
 
-def update_tag_name_in_queens_db(category_id: str, update_name: str, db: dict = queen_db) -> None:
+def update_tag_name_in_queens_db(category_id: UUID, update_name: str, db: dict = queen_db) -> None:
     for queen in db.values():
         for i, tag in enumerate(queen.get("tags")):
-            if category_id in tag["category_id"]:
+            if tag.get("category_id") == category_id:
                 queen["tags"][i]["name"] = update_name
-                print(queen["tags"][i]["name"])
 
 
-def update_city_in_queens_db(city_id: str, new_data_cleaned: dict, db: dict = queen_db) -> None:
+def update_city_in_queens_db(city_id: UUID, new_data_cleaned: dict, db: dict = queen_db) -> None:
     for queen in db.values():
         get_hometown = queen.get("hometown")
         get_residence = queen.get("residence")
@@ -58,7 +56,7 @@ def update_city_in_queens_db(city_id: str, new_data_cleaned: dict, db: dict = qu
                 get_residence.update(new_data_cleaned)
 
 
-def is_able_to_add_to_db(db: dict, limit: int = 20) -> bool:
+def able_to_add_to_db(db: dict, limit: int = 20) -> bool:
     """ Checks the limit of in-memory data. Default limit is 20. """
     if len(db) >= limit:
         return False
