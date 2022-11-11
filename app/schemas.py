@@ -1,7 +1,7 @@
 import datetime
 from enum import Enum
 from typing import List
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from pydantic import BaseModel, EmailStr, HttpUrl, Field, UUID4
 
@@ -16,13 +16,13 @@ class StatusEnum(str, Enum):
 
 
 class CitySave(BaseModel):
-    name: str = Field(max_length=50)
-    region: str = Field(max_length=50)
-    country: str = Field(max_length=50)
+    name: str = Field(min_length=3, max_length=50)
+    region: str = Field(min_length=3, max_length=50)
+    country: str = Field(min_length=3, max_length=50)
 
 
 class City(CitySave):
-    city_id: UUID4
+    city_id: UUID = Field(default_factory=uuid4)
 
 
 class CategorySave(BaseModel):
@@ -30,11 +30,11 @@ class CategorySave(BaseModel):
 
 
 class Category(CategorySave):
-    category_id: UUID4
+    category_id: UUID = Field(default_factory=uuid4)
 
 
 class QueenId(BaseModel):
-    queen_id: UUID4
+    queen_id: UUID = Field(default_factory=uuid4)
 
 
 class QueenBase(QueenId):
