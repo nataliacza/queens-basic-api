@@ -1,13 +1,12 @@
 from uuid import UUID
-from typing import Tuple
 
 from app.db_memory import queen_db
 
 
 def is_unique(search: str, db: dict, in_key: str = "name",
               given_id: UUID = None, pk_name: str = None) -> bool:
-    """ Function that checks if field is unique across db. For PUT method additional
-    check for matching id and name is added. """
+    """ Checks if field is unique across given db. For PUT method additional
+    check for matching id and name was required. """
     for value in db.values():
         if given_id:
             if value.get(pk_name) == given_id and value.get(in_key) == search:
@@ -17,32 +16,41 @@ def is_unique(search: str, db: dict, in_key: str = "name",
     return True
 
 
-def is_assigned(search_id: str, db: dict = queen_db,
-                in_keys: Tuple[str] = ("hometown", "residence", "city_id")) -> bool:
-    for value in db.values():
-        check_hometown = value.get(in_keys[0]).get(in_keys[2])
-        check_residence = value.get(in_keys[1]).get(in_keys[2])
-        if search_id == check_hometown or search_id == check_residence:
-            return True
+def is_assigned(search_id: UUID) -> bool:
+    """ Checks if city id is assigned to queen db. """
+    for value in queen_db.values():
+        check_hometown = value.get("hometown")
+        check_residence = value.get("residence")
+
+        if check_hometown:
+            if check_hometown.get("city_id") == search_id:
+                return True
+
+        if check_residence:
+            if check_residence.get("city_id") == search_id:
+                return True
     return False
 
 
-def delete_tag_from_queens_db(category_id: UUID | str, db: dict = queen_db) -> None:
-    for queen in db.values():
+def delete_tag_from_queens_db(category_id: UUID | str) -> None:
+    """ When tag is deleted, it's reflected in queen db (like cascade delete). """
+    for queen in queen_db.values():
         for i, tag in enumerate(queen.get("tags")):
             if tag.get("category_id") == category_id:
                 del queen["tags"][i]
 
 
-def update_tag_name_in_queens_db(category_id: UUID, update_name: str, db: dict = queen_db) -> None:
-    for queen in db.values():
+def update_tag_name_in_queens_db(category_id: UUID, update_name: str) -> None:
+    """ When tag is updated, it's reflected in queen db. """
+    for queen in queen_db.values():
         for i, tag in enumerate(queen.get("tags")):
             if tag.get("category_id") == category_id:
                 queen["tags"][i]["name"] = update_name
 
 
-def update_city_in_queens_db(city_id: UUID, new_data_cleaned: dict, db: dict = queen_db) -> None:
-    for queen in db.values():
+def update_city_in_queens_db(city_id: UUID, new_data_cleaned: dict) -> None:
+    """ When city is updated, it's reflected in queen db. """
+    for queen in queen_db.values():
         get_hometown = queen.get("hometown")
         get_residence = queen.get("residence")
 

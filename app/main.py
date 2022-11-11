@@ -9,11 +9,11 @@ from app.helpers import (is_unique, is_assigned, update_city_in_queens_db, delet
                          update_tag_name_in_queens_db, able_to_add_to_db)
 from app.schemas import Queen, QueenSave, City, CitySave, Category, CategorySave, QueenBase
 
-app = FastAPI(title="Drag Queens Basic API")
-
+app = FastAPI(title="Drag Queens Collection API - Beta",
+              description="This is a Drag Queens Collection API documentation based on the OpenApi specification.\
+              Main goal of the project is to create simple database available for everybody.")
 
 # region Queens
-
 @app.get("/api/v1/queens/",
          tags=["Queens"],
          status_code=200,
@@ -42,7 +42,6 @@ async def get_queen(queen_id: UUID):
           responses={"404": {"code": "404", "message": "Not Found"}},
           response_model=Queen)
 async def add_queen(queen_details: QueenSave):
-
     hometown = None
     residence = None
     tags = []
@@ -110,7 +109,6 @@ async def add_queen(queen_details: QueenSave):
          responses={"404": {"code": "404", "message": "Not Found"}},
          response_model=Queen)
 async def update_queen(queen_id: UUID, queen_details: QueenSave):
-
     find_queen = queen_db.get(queen_id)
     hometown = None
     residence = None
@@ -185,11 +183,9 @@ async def delete_queen(queen_id: UUID):
 
     return JSONResponse(status_code=404, content={"code": "404",
                                                   "message": "Not Found"})
-
 # endregion
 
 # region Cities
-
 @app.get("/api/v1/cities/",
          tags=["Cities"],
          status_code=200,
@@ -217,10 +213,8 @@ async def get_city(city_id: UUID):
           responses={"400": {"code": "400", "message": "Bad Request"}},
           response_model=City)
 async def add_city(city_details: CitySave):
-
     check = is_unique(search=city_details.name.title().strip(),
-                      in_key="name",
-                      db=city_db)
+                      in_key="name", db=city_db)
 
     if not check:
         return JSONResponse(status_code=400, content={"code": "400",
@@ -241,10 +235,12 @@ async def add_city(city_details: CitySave):
 
 @app.delete("/api/v1/cities/{city_id}",
             tags=["Cities"],
+            description="Unable to delete resource, if any Queen is assigned to city.",
             status_code=204,
             responses={"404": {"code": "404", "message": "Not Found"},
                        "409": {"code": "409", "message": "Conflict"}})
 async def delete_city(city_id: UUID):
+    """ Deletes city from db along with deletion in queen db (cascade) if assigned. """
     find_city = city_db.get(city_id)
     if find_city:
         check = is_assigned(search_id=find_city["city_id"])
@@ -265,6 +261,7 @@ async def delete_city(city_id: UUID):
                     "404": {"code": "404", "message": "Not Found"}},
          response_model=City)
 async def update_city(city_id: UUID, update_data: CitySave):
+    """ Updates city in db along with update in queen db if assigned. """
     find_city = city_db.get(city_id)
     if find_city:
         clean_name = update_data.name.title().strip()
@@ -288,11 +285,9 @@ async def update_city(city_id: UUID, update_data: CitySave):
 
     return JSONResponse(status_code=404, content={"code": "404",
                                                   "message": "Not Found"})
-
 # endregion
 
 # region Categories
-
 @app.get("/api/v1/categories/",
          tags=["Categories"],
          status_code=200,
@@ -344,6 +339,7 @@ async def add_category(category_details: CategorySave):
             status_code=204,
             responses={"404": {"code": "404", "message": "Not Found"}})
 async def delete_category(category_id: UUID):
+    """ Deletes category from db along with deletion in queen db (cascade) if assigned. """
     find_category = category_db.get(category_id)
     if find_category:
         del category_db[category_id]
@@ -361,6 +357,7 @@ async def delete_category(category_id: UUID):
                     "404": {"code": "404", "message": "Not Found"}},
          response_model=Category)
 async def update_category(category_id: UUID, update_data: CategorySave):
+    """ Updates category in db along with update in queen db if assigned. """
     find_category = category_db.get(category_id)
     if find_category:
         check = is_unique(search=update_data.name.lower().strip(), in_key="name", db=category_db)
@@ -376,5 +373,4 @@ async def update_category(category_id: UUID, update_data: CategorySave):
 
     return JSONResponse(status_code=404, content={"code": "404",
                                                   "message": "Not Found"})
-
 # endregion
