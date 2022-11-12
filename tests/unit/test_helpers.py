@@ -125,3 +125,77 @@ class TestIsAssignedValidator(unittest.TestCase):
         # Assert
         assert result is False
 
+
+class TestDeleteCategoryFromQueenTags(unittest.TestCase):
+
+    def test_when_category_is_assigned_to_queen_tags_its_deleted_queen_tags(self):
+        # Arrange
+        new_category = Category(name="cat123")
+        new_queen = Queen(nickname="TestNick", tags=[new_category])
+        queen_db[new_queen.queen_id] = new_queen.dict()
+        # Act
+        delete_tag_from_queens_db(new_category.category_id)
+        # Assert
+        get_queen = queen_db.get(new_queen.queen_id)
+        assert len(get_queen["tags"]) == 0
+        # Clean
+        del queen_db[new_queen.queen_id]
+
+
+class TestUpdateTagsInQueensDb(unittest.TestCase):
+
+    def test_on_tag_update_its_updated_in_all_queens(self):
+        # Arrange
+        new_category = Category(name="cat123")
+        new_queen = Queen(nickname="TestNick", tags=[new_category])
+        new_queen2 = Queen(nickname="TestNick2", tags=[new_category])
+        queen_db[new_queen.queen_id] = new_queen.dict()
+        queen_db[new_queen2.queen_id] = new_queen2.dict()
+        # Act
+        update_tag_name_in_queens_db(new_category.category_id, "new_cat_name")
+        # Assert
+        get_queen_tags = queen_db.get(new_queen.queen_id)["tags"]
+        get_queen2_tags = queen_db.get(new_queen2.queen_id)["tags"]
+        assert get_queen_tags[0].get("name") == "new_cat_name"
+        assert get_queen2_tags[0].get("name") == "new_cat_name"
+        # Clean
+        del queen_db[new_queen.queen_id]
+        del queen_db[new_queen2.queen_id]
+
+
+class TestUpdateCityInQueensDb(unittest.TestCase):
+
+    def test_on_city_update_its_updated_in_queen_db(self):
+        # Arrange
+        new_city = City(name="City123", region="test", country="test")
+        new_queen = Queen(nickname="TestNick", hometown=new_city, residence=new_city)
+        queen_db[new_queen.queen_id] = new_queen.dict()
+        # Act
+        update_city_data = City(name="NewData", region="NewData", country="NewData").dict()
+        update_city_in_queens_db(new_city.city_id, update_city_data)
+        # Assert
+        get_queen_hometown = queen_db.get(new_queen.queen_id)["hometown"]
+        get_queen_residence = queen_db.get(new_queen.queen_id)["residence"]
+        assert get_queen_hometown == update_city_data
+        assert get_queen_residence == update_city_data
+        # Clean
+        del queen_db[new_queen.queen_id]
+
+
+class TestDatabaseLimit(unittest.TestCase):
+
+    def test_when_citi_db_got_19_elements_returns_true(self):
+        # Arrange
+        while len(city_db) != 19:
+            city_db[uuid.uuid4()] = {}
+        # Act
+        result = able_to_add_to_db(city_db)
+        assert result is True
+
+    def test_when_citi_db_got_20_elements_returns_false(self):
+        # Arrange
+        while len(city_db) != 20:
+            city_db[uuid.uuid4()] = {}
+        # Act
+        result = able_to_add_to_db(city_db)
+        assert result is False
