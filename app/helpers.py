@@ -3,15 +3,15 @@ from uuid import UUID
 from app.db_memory import queen_db
 
 
-def is_unique(search: str, db: dict, in_key: str = "name",
-              given_id: UUID = None, pk_name: str = None) -> bool:
-    """ Checks if field is unique across given db. For PUT method additional
+def is_unique_name(search: str, db: dict,
+                   given_id: UUID = None, pk_name: str = None) -> bool:
+    """ Checks if field 'name' is unique across given db. For PUT method additional
     check for matching id and name was required. """
     for value in db.values():
         if given_id:
-            if value.get(pk_name) == given_id and value.get(in_key) == search:
+            if value.get(pk_name) == given_id and value.get("name") == search:
                 return True
-        if search == value.get(in_key):
+        if search == value.get("name"):
             return False
     return True
 
