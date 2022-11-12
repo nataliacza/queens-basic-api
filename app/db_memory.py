@@ -1,3 +1,5 @@
+""" This in-memory 'database' is hardcoded due to impermanent state of items on Deta Cloud. """
+
 from uuid import UUID
 
 queen_db = {

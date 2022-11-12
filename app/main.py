@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from starlette.responses import JSONResponse
 
 from app.db_memory import queen_db, city_db, category_db
-from app.helpers import (is_unique, is_assigned, update_city_in_queens_db, delete_tag_from_queens_db,
+from app.helpers import (is_unique_name, is_assigned, update_city_in_queens_db, delete_tag_from_queens_db,
                          update_tag_name_in_queens_db, able_to_add_to_db)
 from app.schemas import Queen, QueenSave, City, CitySave, Category, CategorySave, QueenBase
 
@@ -213,8 +213,8 @@ async def get_city(city_id: UUID):
           responses={"400": {"code": "400", "message": "Bad Request"}},
           response_model=City)
 async def add_city(city_details: CitySave):
-    check = is_unique(search=city_details.name.title().strip(),
-                      in_key="name", db=city_db)
+    check = is_unique_name(search=city_details.name.title().strip(),
+                           db=city_db)
 
     if not check:
         return JSONResponse(status_code=400, content={"code": "400",
@@ -240,7 +240,7 @@ async def add_city(city_details: CitySave):
             responses={"404": {"code": "404", "message": "Not Found"},
                        "409": {"code": "409", "message": "Conflict"}})
 async def delete_city(city_id: UUID):
-    """ Deletes city from db along with deletion in queen db (cascade) if assigned. """
+    """ Deletes city from db with. If city is assigned to queen hometown or residence, it will return 409 code. """
     find_city = city_db.get(city_id)
     if find_city:
         check = is_assigned(search_id=find_city["city_id"])
@@ -266,8 +266,8 @@ async def update_city(city_id: UUID, update_data: CitySave):
     if find_city:
         clean_name = update_data.name.title().strip()
 
-        check = is_unique(search=clean_name, in_key="name", db=city_db,
-                          given_id=city_id, pk_name="city_id")
+        check = is_unique_name(search=clean_name, db=city_db,
+                               given_id=city_id, pk_name="city_id")
         if not check:
             return JSONResponse(status_code=400, content={"code": "400",
                                                           "message": "Name must be unique"})
@@ -316,9 +316,8 @@ async def get_category(category_id: UUID):
           response_model=Category)
 async def add_category(category_details: CategorySave):
 
-    check = is_unique(search=category_details.name.lower().strip(),
-                      in_key="name",
-                      db=category_db)
+    check = is_unique_name(search=category_details.name.lower().strip(),
+                           db=category_db)
     if not check:
         return JSONResponse(status_code=400,
                             content={"code": "400", "message": "Name must be unique"})
@@ -360,7 +359,7 @@ async def update_category(category_id: UUID, update_data: CategorySave):
     """ Updates category in db along with update in queen db if assigned. """
     find_category = category_db.get(category_id)
     if find_category:
-        check = is_unique(search=update_data.name.lower().strip(), in_key="name", db=category_db)
+        check = is_unique_name(search=update_data.name.lower().strip(), db=category_db)
         if not check:
             return JSONResponse(status_code=400, content={"code": "400",
                                                           "message": "Name must be unique"})
