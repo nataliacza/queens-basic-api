@@ -3,7 +3,7 @@ from enum import Enum
 from typing import List
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, EmailStr, HttpUrl, Field, UUID4
+from pydantic import BaseModel, EmailStr, HttpUrl, Field
 
 
 def get_current_year():
@@ -64,6 +64,6 @@ class QueenSave(QueenSocial):
     status: StatusEnum = Field(default=StatusEnum.Unknown)
     info: str = Field(default=None, max_length=500)
     on_stage_since: int = Field(default=None, le=get_current_year(), gt=get_current_year()-500)
-    hometown: UUID4 = Field(default=None)
-    residence: UUID4 = Field(default=None)
-    tags: List[UUID4] = Field(default=[], unique_items=True)
+    hometown: UUID = Field(default=None)
+    residence: UUID = Field(default=None)
+    tags: List[UUID] = Field(default=[], unique_items=True)

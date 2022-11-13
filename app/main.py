@@ -85,7 +85,7 @@ async def add_queen(queen_details: QueenSave):
         return JSONResponse(status_code=400,
                             content={"code": "400", "message": "Number of items in db was exceeded"})
 
-    new_object = Queen(nickname=queen_details.nickname.title(),
+    new_object = Queen(nickname=queen_details.nickname,
                        status=queen_details.status,
                        info=queen_details.info,
                        on_stage_since=queen_details.on_stage_since,
@@ -155,7 +155,7 @@ async def update_queen(queen_id: UUID, queen_details: QueenSave):
                                                       "message": f"{error['reason']} Id Not Found"})
 
     find_queen.update(queen_details.dict())
-    find_queen["nickname"] = queen_details.nickname.title()
+    find_queen["nickname"] = queen_details.nickname
 
     if hometown is not None:
         find_queen["hometown"] = hometown
