@@ -1,8 +1,5 @@
-
 import unittest
 import uuid
-from typing import Union, Any
-from uuid import UUID
 
 from app.helpers import (is_unique_name, is_assigned, delete_tag_from_queens_db, update_tag_name_in_queens_db,
                          update_city_in_queens_db, able_to_add_to_db)
