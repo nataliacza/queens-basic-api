@@ -30,7 +30,7 @@ class CategorySave(BaseModel):
 
 
 class Category(CategorySave):
-    category_id: UUID = Field(default_factory=uuid4)
+    key: UUID = Field(default_factory=uuid4)
 
 
 class QueenId(BaseModel):
