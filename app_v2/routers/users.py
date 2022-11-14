@@ -3,6 +3,7 @@ from fastapi.encoders import jsonable_encoder
 from starlette.responses import JSONResponse
 
 from auth import auth_handler
+from config import settings
 from database import users_db
 from schemas import User, UserBase, AccessToken, UserSave, UserLogin
 
@@ -25,7 +26,7 @@ async def signup(user_details: UserBase):
         hashed_password = auth_handler.encode_password(user_details.password)
         user = UserSave(username=user_details.username,
                         password=hashed_password)
-        save_user = users_db.put(jsonable_encoder(user))
+        save_user = users_db.put(jsonable_encoder(user), expire_at=settings.db_item_expire_at)
         return save_user
     except Exception as e:
         return JSONResponse(status_code=400, content={"code": "400",
