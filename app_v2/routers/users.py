@@ -18,6 +18,7 @@ router = APIRouter(prefix="/api/v2/users",
                         "401": {"code": "401", "message": "Unauthorized"}},
              response_model=User)
 async def signup(user_details: UserBase):
+    # TODO: Cover db limit
     user = users_db.fetch({"username": user_details.username})
     if user.count > 0:
         return JSONResponse(status_code=400, content={"code": "400",

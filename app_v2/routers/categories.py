@@ -38,7 +38,8 @@ async def get_category(category_id: UUID):
 @router.post("/",
              status_code=201,
              responses={"400": {"code": "400", "message": "Bad Request"},
-                        "401": {"code": "401", "message": "Unauthorized"}},
+                        "401": {"code": "401", "message": "Unauthorized"},
+                        "507": {"code": "507", "message": "Insufficient Storage"}},
              response_model=Category)
 async def add_category(category_details: CategorySave):
     clean_name = category_details.name.lower().strip()
@@ -46,7 +47,7 @@ async def add_category(category_details: CategorySave):
 
     if fetch_db.count == settings.db_limit:
         return JSONResponse(status_code=400,
-                            content={"code": "400", "message": "Number of items in db was exceeded"})
+                            content={"code": "507", "message": "Number of items in db was exceeded"})
 
     if not is_unique_name(clean_name, fetch_db.items):
         return JSONResponse(status_code=400,

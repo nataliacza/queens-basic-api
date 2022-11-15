@@ -38,13 +38,14 @@ async def get_city(city_id: UUID):
 @router.post("/",
              status_code=201,
              responses={"401": {"code": "401", "message": "Unauthorized"},
-                        "400": {"code": "400", "message": "Bad Request"}},
+                        "400": {"code": "400", "message": "Bad Request"},
+                        "507": {"code": "507", "message": "Insufficient Storage"}},
              response_model=City)
 async def add_city(city_details: CitySave):
     fetch_db = cities_db.fetch()
     if fetch_db.count == settings.db_limit:
         return JSONResponse(status_code=400,
-                            content={"code": "400", "message": "Number of items in db was exceeded"})
+                            content={"code": "507", "message": "Number of items in db was exceeded"})
 
     clean_name = city_details.name.title().strip()
     check = is_unique_name(fraze=clean_name, given_data=fetch_db.items)
