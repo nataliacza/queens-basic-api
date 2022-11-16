@@ -7,7 +7,7 @@ from starlette.responses import JSONResponse
 
 from config import settings
 from database import categories_db
-from helpers import is_unique_name
+from helpers import is_unique_name, delete_tag_from_queens_db, update_tag_name_in_queens_db
 from schemas import Category, CategorySave
 
 router = APIRouter(prefix="/api/v2/categories",
@@ -63,24 +63,26 @@ async def add_category(category_details: CategorySave):
                responses={"401": {"code": "401", "message": "Unauthorized"},
                           "404": {"code": "404", "message": "Not Found"}})
 async def delete_category(category_id: UUID):
-    # TODO: cover extra deletion in queens db
-    get_item = categories_db.get(jsonable_encoder(category_id))
+    """ Deletes category from db along with deletion in queen db if assigned. """
+    encoded_id = jsonable_encoder(category_id)
+    get_item = categories_db.get(encoded_id)
     if get_item:
-        categories_db.delete(jsonable_encoder(category_id))
+        categories_db.delete(encoded_id)
+        delete_tag_from_queens_db(encoded_id)
         return {}
 
     return JSONResponse(status_code=404, content={"code": "404",
                                                   "message": "Not Found"})
 
 
-@router.put("{category_id}",
+@router.put("/{category_id}",
             status_code=200,
             responses={"400": {"code": "400", "message": "Bad Request"},
                        "401": {"code": "401", "message": "Unauthorized"},
                        "404": {"code": "404", "message": "Not Found"}},
             response_model=Category)
 async def update_category(category_id: UUID, update_data: CategorySave):
-    # TODO: cover extra update in queens db
+    """ Updates category in db along with update in queen db if assigned. """
     encoded_id = jsonable_encoder(category_id)
     get_item = categories_db.get(encoded_id)
     if get_item:
@@ -93,6 +95,7 @@ async def update_category(category_id: UUID, update_data: CategorySave):
         save_item = categories_db.put(key=encoded_id,
                                       data={"name": clean_name},
                                       expire_at=settings.db_item_expire_at)
+        update_tag_name_in_queens_db(encoded_id, clean_name)
         return save_item
 
     return JSONResponse(status_code=404, content={"code": "404",

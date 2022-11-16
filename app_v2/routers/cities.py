@@ -7,7 +7,7 @@ from starlette.responses import JSONResponse
 
 from config import settings
 from database import cities_db
-from helpers import is_unique_name, is_assigned, is_unique_name_update
+from helpers import is_unique_name, is_assigned, is_unique_name_update, update_city_in_queens_db
 from schemas import City, CitySave
 
 router = APIRouter(prefix="/api/v2/cities",
@@ -92,7 +92,7 @@ async def delete_city(city_id: UUID):
                        "404": {"code": "404", "message": "Not Found"}},
             response_model=City)
 async def update_city(city_id: UUID, update_data: CitySave):
-    # TODO: cover extra update in queens db
+    """ Updates city in db along with update in queen db if assigned. """
     encoded_id = jsonable_encoder(city_id)
     get_item = cities_db.get(encoded_id)
     if get_item:
@@ -111,6 +111,7 @@ async def update_city(city_id: UUID, update_data: CitySave):
         save_item = cities_db.put(key=encoded_id,
                                   data=new_data,
                                   expire_at=settings.db_item_expire_at)
+        update_city_in_queens_db(encoded_id, new_data)
         return save_item
 
     return JSONResponse(status_code=404, content={"code": "404",
