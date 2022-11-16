@@ -15,19 +15,26 @@ router = APIRouter(prefix="/api/v2/users",
 @router.post("/signup",
              status_code=200,
              responses={"400": {"code": "400", "message": "Bad Request"},
-                        "401": {"code": "401", "message": "Unauthorized"}},
+                        "401": {"code": "401", "message": "Unauthorized"},
+                        "507": {"code": "507", "message": "Insufficient Storage"}},
              response_model=User)
 async def signup(user_details: UserBase):
-    # TODO: Cover db limit
-    user = users_db.fetch({"username": user_details.username})
-    if user.count > 0:
+    fetch_users = users_db.fetch()
+
+    if fetch_users.count == settings.db_limit:
+        return JSONResponse(status_code=400,
+                            content={"code": "507", "message": "Number of items in db was exceeded"})
+
+    get_user = [user for user in fetch_users.items if user["username"] == user_details.username]
+
+    if len(get_user) > 0:
         return JSONResponse(status_code=400, content={"code": "400",
                                                       "message": "Account already exist"})
     try:
         hashed_password = auth_handler.encode_password(user_details.password)
-        user = UserSave(username=user_details.username,
-                        password=hashed_password)
-        save_user = users_db.put(jsonable_encoder(user), expire_at=settings.db_item_expire_at)
+        new_user = UserSave(username=user_details.username,
+                            password=hashed_password)
+        save_user = users_db.put(jsonable_encoder(new_user), expire_at=settings.db_item_expire_at)
         return save_user
     except Exception as e:
         return JSONResponse(status_code=400, content={"code": "400",
