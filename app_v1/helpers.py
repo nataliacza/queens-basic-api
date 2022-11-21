@@ -32,7 +32,7 @@ def is_assigned(search_id: UUID) -> bool:
     return False
 
 
-def delete_tag_from_queens_db(category_id: UUID | str) -> None:
+def delete_tag_from_queens_db(category_id: UUID) -> None:
     """ When tag is deleted, it's reflected in queen db (like cascade delete). """
     for queen in queen_db.values():
         for i, tag in enumerate(queen.get("tags")):
