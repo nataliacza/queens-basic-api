@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from app.db_memory import queen_db
+from db_memory import queen_db
 
 
 def is_unique_name(search: str, db: dict,

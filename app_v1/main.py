@@ -4,10 +4,10 @@ from uuid import UUID
 from fastapi import FastAPI
 from starlette.responses import JSONResponse
 
-from app.db_memory import queen_db, city_db, category_db
-from app.helpers import (is_unique_name, is_assigned, update_city_in_queens_db, delete_tag_from_queens_db,
-                         update_tag_name_in_queens_db, able_to_add_to_db)
-from app.schemas import Queen, QueenSave, City, CitySave, Category, CategorySave, QueenBase
+from db_memory import queen_db, city_db, category_db
+from helpers import (is_unique_name, is_assigned, update_city_in_queens_db, delete_tag_from_queens_db,
+                     update_tag_name_in_queens_db, able_to_add_to_db)
+from schemas import Queen, QueenSave, City, CitySave, Category, CategorySave, QueenBase
 
 app = FastAPI(title="Drag Queens Collection API - Beta",
               description="This is a Drag Queens Collection API documentation based on the OpenApi specification.\
