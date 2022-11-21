@@ -14,7 +14,10 @@ class Settings(BaseSettings):
     version: str = "2.0"
 
     deta_project_key: str = os.environ.get("DETA_PROJECT_KEY")
-    jwt_algorithm: str = os.environ.get("ALGORITHM")
+
+    token_algorithm: str = os.environ.get("TOKEN_ALGORITHM")
+    token_type: str = os.environ.get("TOKEN_TYPE")
+    token_issuer: str = os.environ.get("TOKEN_ISSUER")
     jwt_secret: str = os.environ.get("JWT_SECRET")
     jwt_expiry_minutes: int = int(os.environ.get("JWT_EXPIRY_MINUTES", 5))
     jwt_expiry_hours: int = int(os.environ.get("JWT_EXPIRY_HOURS", 1))

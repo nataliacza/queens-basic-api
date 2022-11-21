@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from fastapi.encoders import jsonable_encoder
 from starlette.responses import JSONResponse
 
-from auth import auth_handler
+from auth.auth_handler import encode_password, verify_password, encode_jwt
 from config import settings
 from database import users_db
 from schemas import User, UserBase, AccessToken, UserSave, UserLogin
@@ -31,7 +31,7 @@ async def signup(user_details: UserBase):
         return JSONResponse(status_code=400, content={"code": "400",
                                                       "message": "Account already exist"})
     try:
-        hashed_password = auth_handler.encode_password(user_details.password)
+        hashed_password = encode_password(user_details.password)
         new_user = UserSave(username=user_details.username,
                             password=hashed_password)
         save_user = users_db.put(jsonable_encoder(new_user), expire_at=settings.db_item_expire_at)
@@ -51,11 +51,10 @@ async def login(user_details: UserLogin):
     try:
         if user.count == 1:
             user_dict = user.items[0]
-            check_pw = auth_handler.verify_password(user_details.password, user_dict.get("password"))
+            check_pw = verify_password(user_details.password, user_dict.get("password"))
             if check_pw:
-                access_token = auth_handler.encode_token(user_dict.get("username"))
-                token_obj = AccessToken(token=access_token)
-                return token_obj
+                access_token = encode_jwt(user_details.username)
+                return access_token
 
         return JSONResponse(status_code=401, content={"code": "401",
                                                       "message": "Invalid username or password"})
