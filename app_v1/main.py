@@ -11,7 +11,8 @@ from schemas import Queen, QueenSave, City, CitySave, Category, CategorySave, Qu
 
 app = FastAPI(title="Drag Queens Collection API - Beta",
               description="This is a Drag Queens Collection API documentation based on the OpenApi specification.\
-              Main goal of the project is to create simple database available for everybody.")
+              Main goal of the project is to create simple database available for everybody.",
+              version="1.0")
 
 # region Queens
 @app.get("/api/v1/queens/",
