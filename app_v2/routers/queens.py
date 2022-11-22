@@ -7,8 +7,8 @@ from starlette.responses import JSONResponse
 
 from auth.auth_bearer import JWTBearer
 from config import settings
-from database import queens_db, cities_db, categories_db
-from schemas import QueenBase, Queen, QueenSave
+from db.database import queens_db, cities_db, categories_db
+from schemas.queen import QueenBase, Queen, QueenSave
 
 router = APIRouter(prefix="/api/v2/queens",
                    tags=["Queens"])
@@ -51,7 +51,8 @@ async def add_queen(queen_details: QueenSave):
     fetch_db = queens_db.fetch()
     if fetch_db.count == settings.db_limit:
         return JSONResponse(status_code=400,
-                            content={"code": "507", "message": "Number of items in db was exceeded"})
+                            content={"code": "507",
+                                     "message": "Number of items in db was exceeded"})
 
     while error["status"] is False:
         if queen_details.hometown is not None:

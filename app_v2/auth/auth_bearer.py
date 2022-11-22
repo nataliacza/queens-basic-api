@@ -15,5 +15,4 @@ class JWTBearer(HTTPBearer):
             if payload["scope"] == "access_token":
                 return credentials.credentials
             raise HTTPException(status_code=403, detail="Scope for the token is invalid")
-        else:
-            raise HTTPException(status_code=403, detail="Invalid authorization token.")
+        raise HTTPException(status_code=403, detail="Invalid authorization token.")

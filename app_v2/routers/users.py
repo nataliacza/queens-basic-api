@@ -4,8 +4,8 @@ from starlette.responses import JSONResponse
 
 from auth.auth_handler import encode_password, verify_password, encode_jwt
 from config import settings
-from database import users_db
-from schemas import User, UserBase, AccessToken, UserSave, UserLogin
+from db.database import users_db
+from schemas.auth import User, UserBase, AccessToken, UserSave, UserLogin
 
 router = APIRouter(prefix="/api/v2/users",
                    tags=["Users"])
@@ -23,7 +23,8 @@ async def signup(user_details: UserBase):
 
     if fetch_users.count == settings.db_limit:
         return JSONResponse(status_code=400,
-                            content={"code": "507", "message": "Number of items in db was exceeded"})
+                            content={"code": "507",
+                                     "message": "Number of items in db was exceeded"})
 
     get_user = [user for user in fetch_users.items if user["username"] == user_details.username]
 
@@ -36,9 +37,9 @@ async def signup(user_details: UserBase):
                             password=hashed_password)
         save_user = users_db.put(jsonable_encoder(new_user), expire_at=settings.db_item_expire_at)
         return save_user
-    except Exception as e:
+    except Exception as exc:
         return JSONResponse(status_code=400, content={"code": "400",
-                                                      "message": f"Something went wrong: {e}"})
+                                                      "message": f"Something went wrong: {exc}"})
 
 
 @router.post("/login",
@@ -58,7 +59,7 @@ async def login(user_details: UserLogin):
 
         return JSONResponse(status_code=401, content={"code": "401",
                                                       "message": "Invalid username or password"})
-    except Exception as e:
-        raise Exception(e)
+    except Exception as exc:
+        raise Exception(exc) from exc
 
 # endregion

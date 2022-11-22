@@ -8,9 +8,9 @@ load_dotenv()
 
 class Settings(BaseSettings):
     title: str = "Drag Queens Collection API - v2"
-    description: str = """Drag Queens Collection API is an application, using which you can search for information
-    about Drag Queens in Poland. Main goal of the project is to create lightweight and simple database
-    available for everybody."""
+    description: str = """Drag Queens Collection API is an application, using which 
+    you can search for information about Drag Queens in Poland. Main goal 
+    of the project is to create lightweight and simple db available for everybody."""
     version: str = "2.0"
 
     deta_project_key: str = os.environ.get("DETA_PROJECT_KEY")
