@@ -1,36 +1,16 @@
 import datetime
-from enum import Enum
 from typing import List
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, EmailStr, HttpUrl, Field
+from pydantic import BaseModel, Field, EmailStr, HttpUrl
+
+from schemas.category import Category
+from schemas.city import City
+from schemas.enums import StatusEnum
 
 
 def get_current_year():
     return datetime.datetime.utcnow().year
-
-class StatusEnum(str, Enum):
-    Active = "Active"
-    Inactive = "Inactive"
-    Unknown = "Unknown"
-
-
-class CitySave(BaseModel):
-    name: str = Field(min_length=3, max_length=50)
-    region: str = Field(min_length=3, max_length=50)
-    country: str = Field(min_length=3, max_length=50)
-
-
-class City(CitySave):
-    key: UUID = Field(default_factory=uuid4)
-
-
-class CategorySave(BaseModel):
-    name: str = Field(min_length=3, max_length=10)
-
-
-class Category(CategorySave):
-    key: UUID = Field(default_factory=uuid4)
 
 
 class QueenId(BaseModel):
@@ -67,32 +47,3 @@ class QueenSave(QueenSocial):
     hometown: UUID = Field(default=None)
     residence: UUID = Field(default=None)
     tags: List[UUID] = Field(default=[], unique_items=True)
-
-
-class UserId(BaseModel):
-    key: UUID = Field(default_factory=uuid4)
-
-
-class UserName(BaseModel):
-    username: str = Field(min_length=5, max_length=20)
-
-
-class UserBase(UserName):
-    password: str = Field(min_length=5, max_length=20)
-
-
-class UserSave(UserName, UserId):
-    password: str
-
-
-class User(UserName, UserId):
-    pass
-
-
-class UserLogin(BaseModel):
-    username: str
-    password: str
-
-
-class AccessToken(BaseModel):
-    token: str

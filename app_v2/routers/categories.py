@@ -1,16 +1,15 @@
 from typing import List
 from uuid import UUID
 
-from fastapi import APIRouter, Security, Depends
+from fastapi import APIRouter, Depends
 from fastapi.encoders import jsonable_encoder
-from fastapi.security import HTTPAuthorizationCredentials
 from starlette.responses import JSONResponse
 
 from auth.auth_bearer import JWTBearer
 from config import settings
-from database import categories_db
+from db.database import categories_db
 from helpers import is_unique_name, delete_tag_from_queens_db, update_tag_name_in_queens_db
-from schemas import Category, CategorySave
+from schemas.category import Category, CategorySave
 
 router = APIRouter(prefix="/api/v2/categories",
                    tags=["Categories"])
@@ -55,7 +54,8 @@ async def add_category(category_details: CategorySave):
 
     if fetch_db.count == settings.db_limit:
         return JSONResponse(status_code=400,
-                            content={"code": "507", "message": "Number of items in db was exceeded"})
+                            content={"code": "507",
+                                     "message": "Number of items in db was exceeded"})
 
     if not is_unique_name(clean_name, fetch_db.items):
         return JSONResponse(status_code=400,

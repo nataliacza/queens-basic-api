@@ -7,9 +7,9 @@ from starlette.responses import JSONResponse
 
 from auth.auth_bearer import JWTBearer
 from config import settings
-from database import cities_db
+from db.database import cities_db
 from helpers import (is_unique_name, is_assigned, is_unique_name_update, update_city_in_queens_db)
-from schemas import City, CitySave
+from schemas.city import City, CitySave
 
 router = APIRouter(prefix="/api/v2/cities",
                    tags=["Cities"])

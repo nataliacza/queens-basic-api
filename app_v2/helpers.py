@@ -3,7 +3,7 @@ from uuid import UUID
 from fastapi.encoders import jsonable_encoder
 
 from config import settings
-from database import queens_db
+from db.database import queens_db
 
 
 def is_unique_name(fraze: str, given_data: list[dict[str, str]]) -> bool:
