@@ -1,9 +1,12 @@
+from typing import Union, List
 from uuid import UUID
 
 from fastapi.encoders import jsonable_encoder
 
 from config import settings
 from db.database import queens_db
+from schemas.enums import StatusEnum
+from schemas.queen import QueenBase
 
 
 def is_unique_name(fraze: str, given_data: list[dict[str, str]]) -> bool:
@@ -90,3 +93,33 @@ def update_city_in_queens_db(city_key: str, updated_data: dict) -> None:
                 queens_db.update(updates={"residence": get_residence},
                                  key=queen.get("key"),
                                  expire_at=settings.db_item_expire_at)
+
+
+def filter_queens(nickname: Union[str, None],
+                  status: Union[StatusEnum, None],
+                  tags: Union[List[str], None]) -> List[QueenBase]:
+
+    query = {}
+    if nickname:
+        query["nickname?contains"] = nickname
+
+    if status:
+        query["status"] = status
+
+    if len(query) != 0:
+        result = queens_db.fetch(query=query).items
+    else:
+        result = queens_db.fetch().items
+
+    if tags:
+        indexes = []
+        for i, queen in enumerate(result):
+            tag_names = [tag["name"] for tag in queen["tags"]]
+            check = all(t.lower() in tag_names for t in tags)
+            if not check:
+                indexes.append(i)
+
+        for j in indexes[::-1]:
+            del result[j]
+
+    return result

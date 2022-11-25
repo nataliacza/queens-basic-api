@@ -1,13 +1,15 @@
-from typing import List
+from typing import List, Union
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from fastapi.encoders import jsonable_encoder
 from starlette.responses import JSONResponse
 
 from auth.auth_bearer import JWTBearer
 from config import settings
 from db.database import queens_db, cities_db, categories_db
+from helpers import filter_queens
+from schemas.enums import StatusEnum
 from schemas.queen import QueenBase, Queen, QueenSave
 
 router = APIRouter(prefix="/api/v2/queens",
@@ -16,10 +18,14 @@ router = APIRouter(prefix="/api/v2/queens",
 # region Queens
 @router.get("/",
             status_code=200,
-            response_model=List[QueenBase])
-async def get_all_queens():
-    fetch_db = queens_db.fetch().items
-    return fetch_db
+            response_model=List[QueenBase],
+            description="Search parameters will look for items meeting all provided conditions,\
+            e.g. nickname='name' AND status='Active' AND tags=['tag1', 'tag2']).")
+async def get_all_queens(search_nickname: Union[str, None] = Query(default=None),
+                         search_status: Union[StatusEnum, None] = Query(default=None),
+                         search_tags: Union[List[str], None] = Query(default=None)):
+    result = filter_queens(search_nickname, search_status, search_tags)
+    return result
 
 
 @router.get("/{queen_id}",
