@@ -104,7 +104,8 @@ async def add_queen(queen_details: QueenSave):
                        twitter=queen_details.twitter,
                        tags=tags)
 
-    save_item = queens_db.put(jsonable_encoder(new_object), expire_at=settings.db_item_expire_at)
+    save_item = queens_db.put(jsonable_encoder(new_object),
+                              expire_at=settings.db_item_expire_at)
     return save_item
 
 

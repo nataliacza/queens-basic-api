@@ -54,19 +54,17 @@ async def add_city(city_details: CitySave):
         return JSONResponse(status_code=400,
                             content={"code": "507", "message": "Number of items in db was exceeded"})
 
-    clean_name = city_details.name.title().strip()
-    check = is_unique_name(fraze=clean_name, given_data=fetch_db.items)
+    check = is_unique_name(fraze=city_details.name, given_data=fetch_db.items)
     if not check:
         return JSONResponse(status_code=400, content={"code": "400",
                                                       "message": "Name must be unique"})
 
-    clean_region = city_details.region.title().strip()
-    clean_country = city_details.country.title().strip()
-    new_item = City(name=clean_name,
-                    region=clean_region,
-                    country=clean_country)
+    new_item = City(name=city_details.name,
+                    region=city_details.region,
+                    country=city_details.country)
 
-    save_item = cities_db.put(jsonable_encoder(new_item), expire_at=settings.db_item_expire_at)
+    save_item = cities_db.put(jsonable_encoder(new_item),
+                              expire_at=settings.db_item_expire_at)
     return save_item
 
 
@@ -107,17 +105,15 @@ async def update_city(city_id: UUID, update_data: CitySave):
     encoded_id = jsonable_encoder(city_id)
     get_item = cities_db.get(encoded_id)
     if get_item:
-        clean_name = update_data.name.title().strip()
-        check = is_unique_name_update(fraze=clean_name, given_data=cities_db.fetch().items, update_id=encoded_id)
+        check = is_unique_name_update(fraze=update_data.name, given_data=cities_db.fetch().items,
+                                      update_id=encoded_id)
         if not check:
             return JSONResponse(status_code=400, content={"code": "400",
                                                           "message": "Name must be unique"})
-        clean_region = update_data.region.title().strip()
-        clean_country = update_data.country.title().strip()
 
-        new_data = {"name": clean_name,
-                    "region": clean_region,
-                    "country": clean_country}
+        new_data = {"name": update_data.name,
+                    "region": update_data.region,
+                    "country": update_data.country}
 
         save_item = cities_db.put(key=encoded_id,
                                   data=new_data,

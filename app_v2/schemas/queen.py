@@ -2,7 +2,7 @@ import datetime
 from typing import List
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, Field, EmailStr, HttpUrl
+from pydantic import BaseModel, Field, EmailStr, HttpUrl, validator
 
 from schemas.category import Category
 from schemas.city import City
@@ -23,6 +23,13 @@ class QueenBase(QueenId):
     on_stage_since: int = Field(default=None, le=get_current_year(), gt=get_current_year()-500)
     tags: List[Category] = Field(default=[], unique_items=True)
 
+    @validator("nickname")
+    def transform(cls, v: str):
+        return v.title()
+
+    class Config:
+        anystr_strip_whitespace = True
+
 
 class QueenSocial(BaseModel):
     email: EmailStr = Field(default=None)
@@ -38,6 +45,13 @@ class Queen(QueenBase, QueenSocial, QueenId):
     hometown: City = Field(default=None)
     residence: City = Field(default=None)
 
+    @validator("nickname")
+    def transform(cls, v: str):
+        return v.title()
+
+    class Config:
+        anystr_strip_whitespace = True
+
 
 class QueenSave(QueenSocial):
     nickname: str = Field(min_length=2, max_length=40)
@@ -47,3 +61,10 @@ class QueenSave(QueenSocial):
     hometown: UUID = Field(default=None)
     residence: UUID = Field(default=None)
     tags: List[UUID] = Field(default=[], unique_items=True)
+
+    @validator("nickname")
+    def transform(cls, v: str):
+        return v.title()
+
+    class Config:
+        anystr_strip_whitespace = True
