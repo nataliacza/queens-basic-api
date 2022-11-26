@@ -49,7 +49,6 @@ async def get_category(category_id: UUID):
              response_model=Category,
              dependencies=[Depends(JWTBearer())])
 async def add_category(category_details: CategorySave):
-    clean_name = category_details.name.lower().strip()
     fetch_db = categories_db.fetch()
 
     if fetch_db.count == settings.db_limit:
@@ -57,12 +56,13 @@ async def add_category(category_details: CategorySave):
                             content={"code": "507",
                                      "message": "Number of items in db was exceeded"})
 
-    if not is_unique_name(clean_name, fetch_db.items):
+    if not is_unique_name(category_details.name, fetch_db.items):
         return JSONResponse(status_code=400,
                             content={"code": "400", "message": "Name must be unique"})
 
-    new_item = Category(name=clean_name)
-    save_item = categories_db.put(jsonable_encoder(new_item), expire_at=settings.db_item_expire_at)
+    new_item = Category(name=category_details.name)
+    save_item = categories_db.put(jsonable_encoder(new_item),
+                                  expire_at=settings.db_item_expire_at)
     return save_item
 
 
@@ -98,16 +98,16 @@ async def update_category(*, category_id: UUID, update_data: CategorySave):
     encoded_id = jsonable_encoder(category_id)
     get_item = categories_db.get(encoded_id)
     if get_item:
-        clean_name = update_data.name.lower().strip()
-        check = is_unique_name(fraze=clean_name, given_data=categories_db.fetch().items)
+        check = is_unique_name(fraze=update_data.name,
+                               given_data=categories_db.fetch().items)
         if not check:
             return JSONResponse(status_code=400, content={"code": "400",
                                                           "message": "Name must be unique"})
 
         save_item = categories_db.put(key=encoded_id,
-                                      data={"name": clean_name},
+                                      data={"name": update_data.name},
                                       expire_at=settings.db_item_expire_at)
-        update_tag_name_in_queens_db(encoded_id, clean_name)
+        update_tag_name_in_queens_db(encoded_id, update_data.name)
         return save_item
 
     return JSONResponse(status_code=404, content={"code": "404",
