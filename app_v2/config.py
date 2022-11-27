@@ -25,6 +25,8 @@ class Settings(BaseSettings):
     db_limit: int = 20
     db_item_expire_at = datetime.datetime.fromisoformat("2023-02-01T00:00:00")
 
+    cors_origins = os.environ.get("ORIGINS")
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
