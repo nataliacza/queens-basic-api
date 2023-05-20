@@ -10,15 +10,17 @@ from schemas.queen import QueenBase
 
 
 def is_unique_name(fraze: str, given_data: list[dict[str, str]]) -> bool:
-    """ Checks if field 'name' is unique across list. """
+    """Checks if field 'name' is unique across list."""
     for value in given_data:
         if fraze == value.get("name"):
             return False
     return True
 
 
-def is_unique_name_update(fraze: str, given_data: list[dict[str, str]], update_id: str) -> bool:
-    """ Checks if field 'name' is unique across list. Additional check for PUT requires id/key. """
+def is_unique_name_update(
+    fraze: str, given_data: list[dict[str, str]], update_id: str
+) -> bool:
+    """Checks if field 'name' is unique across list. Additional check for PUT requires id/key."""
     for value in given_data:
         if fraze == value.get("name"):
             if update_id == value.get("key"):
@@ -28,7 +30,7 @@ def is_unique_name_update(fraze: str, given_data: list[dict[str, str]], update_i
 
 
 def is_assigned(search_id: UUID) -> bool:
-    """ Checks whether city id is assigned to queen hometown or residence. """
+    """Checks whether city id is assigned to queen hometown or residence."""
     fetch_queens = queens_db.fetch().items
     for queen in fetch_queens:
         check_hometown = queen.get("hometown")
@@ -45,7 +47,7 @@ def is_assigned(search_id: UUID) -> bool:
 
 
 def delete_tag_from_queens_db(category_key: str) -> None:
-    """ When tag is deleted, it's reflected in queen db (like cascade delete). """
+    """When tag is deleted, it's reflected in queen db (like cascade delete)."""
     encode_tag_key = jsonable_encoder(category_key)
     queens = queens_db.fetch().items
     for queen in queens:
@@ -53,13 +55,15 @@ def delete_tag_from_queens_db(category_key: str) -> None:
         for i, tag in enumerate(queen.get("tags")):
             if tag.get("key") == encode_tag_key:
                 del queen_tags[i]
-                queens_db.update(updates={"tags": queen_tags},
-                                 key=queen.get("key"),
-                                 expire_at=settings.db_item_expire_at)
+                queens_db.update(
+                    updates={"tags": queen_tags},
+                    key=queen.get("key"),
+                    expire_at=settings.db_item_expire_at,
+                )
 
 
 def update_tag_name_in_queens_db(category_key: str, update_name: str) -> None:
-    """ When tag is updated, it's reflected in queen db. """
+    """When tag is updated, it's reflected in queen db."""
     encode_tag_key = jsonable_encoder(category_key)
     queens = queens_db.fetch().items
     for queen in queens:
@@ -67,13 +71,15 @@ def update_tag_name_in_queens_db(category_key: str, update_name: str) -> None:
         for i, tag in enumerate(queen.get("tags")):
             if tag.get("key") == encode_tag_key:
                 queen_tags[i]["name"] = update_name
-                queens_db.update(updates={"tags": queen_tags},
-                                 key=queen.get("key"),
-                                 expire_at=settings.db_item_expire_at)
+                queens_db.update(
+                    updates={"tags": queen_tags},
+                    key=queen.get("key"),
+                    expire_at=settings.db_item_expire_at,
+                )
 
 
 def update_city_in_queens_db(city_key: str, updated_data: dict) -> None:
-    """ When city is updated, it's reflected in queen db. """
+    """When city is updated, it's reflected in queen db."""
     encode_tag_key = jsonable_encoder(city_key)
     queens = queens_db.fetch().items
     for queen in queens:
@@ -83,21 +89,27 @@ def update_city_in_queens_db(city_key: str, updated_data: dict) -> None:
         if get_hometown is not None:
             if get_hometown["key"] == encode_tag_key:
                 get_hometown.update(updated_data)
-                queens_db.update(updates={"hometown": get_hometown},
-                                 key=queen.get("key"),
-                                 expire_at=settings.db_item_expire_at)
+                queens_db.update(
+                    updates={"hometown": get_hometown},
+                    key=queen.get("key"),
+                    expire_at=settings.db_item_expire_at,
+                )
 
         if get_residence is not None:
             if get_residence["key"] == encode_tag_key:
                 get_residence.update(updated_data)
-                queens_db.update(updates={"residence": get_residence},
-                                 key=queen.get("key"),
-                                 expire_at=settings.db_item_expire_at)
+                queens_db.update(
+                    updates={"residence": get_residence},
+                    key=queen.get("key"),
+                    expire_at=settings.db_item_expire_at,
+                )
 
 
-def filter_queens(nickname: Union[str, None],
-                  status: Union[StatusEnum, None],
-                  tags: Union[List[str], None]) -> List[QueenBase]:
+def filter_queens(
+    nickname: Union[str, None],
+    status: Union[StatusEnum, None],
+    tags: Union[List[str], None],
+) -> List[QueenBase]:
 
     query = {}
     if nickname:
