@@ -20,7 +20,9 @@ class QueenId(BaseModel):
 class QueenBase(QueenId):
     nickname: str = Field(min_length=2, max_length=40)
     status: StatusEnum = Field(default=StatusEnum.Unknown)
-    on_stage_since: int = Field(default=None, le=get_current_year(), gt=get_current_year()-500)
+    on_stage_since: int = Field(
+        default=None, le=get_current_year(), gt=get_current_year() - 500
+    )
     tags: List[Category] = Field(default=[], unique_items=True)
 
     @validator("nickname")
@@ -57,7 +59,9 @@ class QueenSave(QueenSocial):
     nickname: str = Field(min_length=2, max_length=40)
     status: StatusEnum = Field(default=StatusEnum.Unknown)
     info: str = Field(default=None, max_length=500)
-    on_stage_since: int = Field(default=None, le=get_current_year(), gt=get_current_year()-500)
+    on_stage_since: int = Field(
+        default=None, le=get_current_year(), gt=get_current_year() - 500
+    )
     hometown: UUID = Field(default=None)
     residence: UUID = Field(default=None)
     tags: List[UUID] = Field(default=[], unique_items=True)

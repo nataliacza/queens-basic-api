@@ -9,10 +9,14 @@ class JWTBearer(HTTPBearer):
         super(JWTBearer, self).__init__(auto_error=auto_error)
 
     async def __call__(self, request: Request):
-        credentials: HTTPAuthorizationCredentials = await super(JWTBearer, self).__call__(request)
+        credentials: HTTPAuthorizationCredentials = await super(
+            JWTBearer, self
+        ).__call__(request)
         if credentials:
             payload = decode_jwt(credentials.credentials)
             if payload["scope"] == "access_token":
                 return credentials.credentials
-            raise HTTPException(status_code=403, detail="Scope for the token is invalid")
+            raise HTTPException(
+                status_code=403, detail="Scope for the token is invalid"
+            )
         raise HTTPException(status_code=403, detail="Invalid authorization token.")
