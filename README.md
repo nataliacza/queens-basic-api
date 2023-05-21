@@ -1,6 +1,6 @@
 # Drag Queens Collection API
 
-Drag Queens Collection API made using python and in FastApi framework.
+Drag Queens Collection API made using Python 3 and in FastAPI.
 
 ## Description
 
